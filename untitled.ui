@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1179</width>
+    <width>1164</width>
     <height>892</height>
    </rect>
   </property>
@@ -14,42 +14,38 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>20</x>
       <y>0</y>
-      <width>1091</width>
-      <height>831</height>
+      <width>1131</width>
+      <height>811</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout_4" stretch="20,80">
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <layout class="QVBoxLayout" name="verticalLayout_5">
          <item>
-          <widget class="QPushButton" name="pushButton">
+          <widget class="QPushButton" name="connect_btn">
+           <property name="text">
+            <string>Connect</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="scan_btn">
            <property name="text">
             <string>Scan Devices</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_12">
-           <property name="text">
-            <string>Connect</string>
-           </property>
-          </widget>
+          <widget class="QListView" name="device_list"/>
          </item>
         </layout>
-       </item>
-       <item>
-        <widget class="MultiPageWidget" name="multipagewidget">
-         <widget class="QWidget" name="page">
-          <zorder>listView_2</zorder>
-         </widget>
-        </widget>
        </item>
       </layout>
      </item>
@@ -60,14 +56,14 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout" stretch="50,50">
            <item>
-            <widget class="QPushButton" name="pushButton_7">
+            <widget class="QPushButton" name="firmware_btn">
              <property name="text">
               <string>Get Firmware Version</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_2">
+            <widget class="QPushButton" name="emg_btn">
              <property name="text">
               <string>Config</string>
              </property>
@@ -78,14 +74,14 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
-            <widget class="QPushButton" name="pushButton_8">
+            <widget class="QPushButton" name="led_btn">
              <property name="text">
               <string>Toggle LED</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_9">
+            <widget class="QPushButton" name="motor_btn">
              <property name="text">
               <string>Toggle Motor</string>
              </property>
@@ -96,14 +92,14 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
-            <widget class="QPushButton" name="pushButton_3">
+            <widget class="QPushButton" name="raw_emg_btn">
              <property name="text">
               <string>Get RAW EMG Data</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_4">
+            <widget class="QPushButton" name="stop_emg_btn">
              <property name="text">
               <string>Stop EMG Data</string>
              </property>
@@ -114,14 +110,14 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
-            <widget class="QPushButton" name="pushButton_5">
+            <widget class="QPushButton" name="gesture_btn">
              <property name="text">
               <string>Get Gesture ID</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_6">
+            <widget class="QPushButton" name="stop_gesture_btn">
              <property name="text">
               <string>Stop Gesture ID</string>
              </property>
@@ -132,14 +128,14 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
-            <widget class="QPushButton" name="pushButton_10">
+            <widget class="QPushButton" name="quaternion_btn">
              <property name="text">
               <string>Get Quaternion</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_11">
+            <widget class="QPushButton" name="stop_quat_btn">
              <property name="text">
               <string>Stop Quaternion</string>
              </property>
@@ -150,7 +146,7 @@
         </layout>
        </item>
        <item>
-        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="20,80">
+        <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,80">
          <item>
           <widget class="QListView" name="listView_2"/>
          </item>
@@ -169,7 +165,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1179</width>
+     <width>1164</width>
      <height>27</height>
     </rect>
    </property>
@@ -200,15 +196,8 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>MultiPageWidget</class>
-   <extends>QWidget</extends>
-   <header>multipagewidget.h</header>
-   <addpagemethod>addPage</addpagemethod>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../../../Downloads/QDarkStyleSheet-master/qdarkstyle/dark/darkstyle.qrc"/>
+ </resources>
  <connections/>
 </ui>
