@@ -16,11 +16,10 @@ class GoogleDriveManager:
         self.app_folder_id = self.ensure_app_folder()
 
     def authenticate_persistently(self):
-        credentials_file = self.gauth.settings.get('save_credentials_file')
-        assert credentials_file, 'Credentials file path not set in the settings file'
+        credentials_path = self.gauth.settings.get('save_credentials_file')
 
-        if os.path.exists(credentials_file):
-            self.gauth.LoadCredentialsFile(credentials_file)
+        if os.path.exists(credentials_path):
+            self.gauth.LoadCredentialsFile(credentials_path)
 
         if self.gauth.credentials is None:
             self.gauth.LocalWebserverAuth()
@@ -29,7 +28,7 @@ class GoogleDriveManager:
         else:
             self.gauth.Authorize()
 
-        self.gauth.SaveCredentialsFile(credentials_file)
+        self.gauth.SaveCredentialsFile(credentials_path)
 
     def ensure_app_folder(self):
         folder_id = self.get_folder_id()
