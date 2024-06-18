@@ -4,18 +4,18 @@ import sys
 from PySide6 import QtCore, QtGui, QtWidgets
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QMainWindow, QApplication
-from ui_main import Ui_MainWindow
+from test.ui_main import Ui_MainWindow
 
 # Import Connector class
-from connector import Connector
-from ui_functions import UIFunctions
+from test.connector import Connector
+from test.ui_functions import UIFunctions
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        
+
         # Initialize Connector
         self.connector = Connector()
 
@@ -42,7 +42,7 @@ class MainWindow(QMainWindow):
 
     def toggle_menu(self):
         UIFunctions.toggle_menu(self, 220, True)  # 220 is the maximum width of the menu
-        
+
         pass
 
     def scan_devices(self):

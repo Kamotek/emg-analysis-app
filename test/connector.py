@@ -3,7 +3,7 @@
 import struct
 import time
 import csv
-from gforce import DataNotifFlags, GForceProfile, NotifDataType
+from test.gforce import DataNotifFlags, GForceProfile, NotifDataType
 
 # Callback functions
 def set_cmd_cb(resp):
