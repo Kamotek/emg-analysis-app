@@ -233,7 +233,7 @@ QPushButton:hover {
 }</string>
                </property>
                <property name="text">
-                <string>Data Visualization</string>
+                <string>Data Classification</string>
                </property>
               </widget>
              </item>
@@ -256,7 +256,7 @@ QPushButton:hover {
 }</string>
                </property>
                <property name="text">
-                <string>Data Classification</string>
+                <string>Data Visualization</string>
                </property>
               </widget>
              </item>
@@ -278,7 +278,7 @@ QPushButton:hover {
           <item>
            <widget class="QStackedWidget" name="stackedWidget">
             <property name="currentIndex">
-             <number>3</number>
+             <number>0</number>
             </property>
             <widget class="QWidget" name="page_1">
              <layout class="QVBoxLayout" name="verticalLayout_7" stretch="0,0,0,0,20,100">
@@ -286,6 +286,9 @@ QPushButton:hover {
                <layout class="QHBoxLayout" name="horizontalLayout_3">
                 <item>
                  <widget class="QPushButton" name="firmware_btn">
+                  <property name="styleSheet">
+                   <string notr="true">color: white;</string>
+                  </property>
                   <property name="text">
                    <string>Get Firmware Version</string>
                   </property>
@@ -293,6 +296,9 @@ QPushButton:hover {
                 </item>
                 <item>
                  <widget class="QPushButton" name="led_btn">
+                  <property name="styleSheet">
+                   <string notr="true">color: white;</string>
+                  </property>
                   <property name="text">
                    <string>Toggle LED</string>
                   </property>
@@ -300,6 +306,9 @@ QPushButton:hover {
                 </item>
                 <item>
                  <widget class="QPushButton" name="raw_emg_button">
+                  <property name="styleSheet">
+                   <string notr="true">color: white;</string>
+                  </property>
                   <property name="text">
                    <string>Get RAW EMG Data</string>
                   </property>
@@ -310,10 +319,16 @@ QPushButton:hover {
                   <property name="text">
                    <string>Get Gesture ID</string>
                   </property>
+                      <property name="styleSheet">
+      <string notr="true">color: white;</string>
+    </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QPushButton" name="quaternion_btn">
+                  <property name="styleSheet">
+                   <string notr="true">color: white;</string>
+                  </property>
                   <property name="text">
                    <string>Get Quaternion</string>
                   </property>
@@ -325,6 +340,9 @@ QPushButton:hover {
                <layout class="QHBoxLayout" name="horizontalLayout_4">
                 <item>
                  <widget class="QPushButton" name="emg_btn">
+                  <property name="styleSheet">
+                   <string notr="true">color: white;</string>
+                  </property>
                   <property name="text">
                    <string>Config</string>
                   </property>
@@ -332,6 +350,9 @@ QPushButton:hover {
                 </item>
                 <item>
                  <widget class="QPushButton" name="motor_btn">
+                  <property name="styleSheet">
+                   <string notr="true">color: white;</string>
+                  </property>
                   <property name="text">
                    <string>Toggle Motor</string>
                   </property>
@@ -339,6 +360,9 @@ QPushButton:hover {
                 </item>
                 <item>
                  <widget class="QPushButton" name="stop_emg_button">
+                  <property name="styleSheet">
+                   <string notr="true">color: white;</string>
+                  </property>
                   <property name="text">
                    <string>Stop EMG Data</string>
                   </property>
@@ -346,13 +370,22 @@ QPushButton:hover {
                 </item>
                 <item>
                  <widget class="QPushButton" name="stop_gesture_btn">
+                  <property name="styleSheet">
+                   <string notr="true">color: white;</string>
+                  </property>
                   <property name="text">
                    <string>Stop Gesture ID</string>
                   </property>
+                      <property name="styleSheet">
+      <string notr="true">color: white;</string>
+    </property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QPushButton" name="stop_quat_btn">
+                  <property name="styleSheet">
+                   <string notr="true">color: white;</string>
+                  </property>
                   <property name="text">
                    <string>Stop Quaternion</string>
                   </property>
@@ -362,6 +395,9 @@ QPushButton:hover {
               </item>
               <item>
                <widget class="QPushButton" name="scan_btn">
+                <property name="styleSheet">
+                 <string notr="true">color: white;</string>
+                </property>
                 <property name="text">
                  <string>Scan Devices</string>
                 </property>
@@ -369,6 +405,9 @@ QPushButton:hover {
               </item>
               <item>
                <widget class="QPushButton" name="connect_btn">
+                <property name="styleSheet">
+                 <string notr="true">color: white;</string>
+                </property>
                 <property name="text">
                  <string>Connect</string>
                 </property>
@@ -409,6 +448,9 @@ QPushButton:hover {
                   <property name="text">
                    <string>Local Files:</string>
                   </property>
+                                        <property name="styleSheet">
+      <string notr="true">color: white;</string>
+    </property>
                  </widget>
                 </item>
                 <item>
@@ -416,6 +458,9 @@ QPushButton:hover {
                   <property name="text">
                    <string>External Server Files:</string>
                   </property>
+                                        <property name="styleSheet">
+      <string notr="true">color: white;</string>
+    </property>
                  </widget>
                 </item>
                </layout>
@@ -451,6 +496,9 @@ QPushButton:hover {
                   <property name="text">
                    <string>Upload Data</string>
                   </property>
+                                        <property name="styleSheet">
+      <string notr="true">color: white;</string>
+    </property>
                  </widget>
                 </item>
                 <item>
@@ -458,6 +506,9 @@ QPushButton:hover {
                   <property name="text">
                    <string>Download Data</string>
                   </property>
+                                        <property name="styleSheet">
+      <string notr="true">color: white;</string>
+    </property>
                  </widget>
                 </item>
                </layout>

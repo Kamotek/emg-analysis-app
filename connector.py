@@ -85,6 +85,11 @@ class Connector(QObject):
         self.channelMask = None
         self.dataLen = None
         self.resolution = None
+        self.age = None
+        self.gender = None
+        self.height = None
+        self.weight = None
+
 
     def scan_devices(self):
         print("Scanning devices...")
@@ -130,12 +135,16 @@ class Connector(QObject):
         self.GF.stopDataNotification()
         self.GF.setDataNotifSwitch(DataNotifFlags["DNF_OFF"], set_cmd_cb, 1000)
 
-    def configure_emg_raw_data(self, sampRate, channelMask, dataLen, resolution):
+    def configure_emg_raw_data(self, sampRate, channelMask, dataLen, resolution, age, gender, height, weight):
         self.sampRate = sampRate
         self.channelMask = channelMask
         self.dataLen = dataLen
         self.resolution = resolution
-        
+        self.age = age
+        self.gender = gender
+        self.height = height
+        self.weight = weight
+
         self.GF.setEmgRawDataConfig(sampRate, channelMask, dataLen, resolution, cb=set_cmd_cb, timeout=1000)
 
 
@@ -158,6 +167,11 @@ class Connector(QObject):
             self.GF.startDataNotification(lambda data: ondata(data, self))
         else:
             print("EMG configuration is not set. Call configure_emg_raw_data first.")
+
+    def fetch_data(self):
+        # Placeholder for data fetching logic
+        # Replace with actual data fetching logic
+        return "Data fetched"
 
     def random_forest_classification(self, data):
         # Placeholder for classification logic
