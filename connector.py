@@ -4,9 +4,8 @@ import classifiers_and_tests.classifier_svm
 import classifiers_and_tests.classifier_logistic_regression
 import classifiers_and_tests.classifier_tree_with_feature_selection
 import classifiers_and_tests.classifier_tree
-import visualizers.draw
 from visualizers import draw
-from test.gforce import DataNotifFlags, GForceProfile, NotifDataType
+from band_interface.gforce import DataNotifFlags, GForceProfile, NotifDataType
 import struct
 import csv
 import time
@@ -198,4 +197,3 @@ class Connector(QObject):
         except Exception as e:
             print(f"Error visualizing file {file_path}: {e}")
 
-    # Other methods of the Connector cl

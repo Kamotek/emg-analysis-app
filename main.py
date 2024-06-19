@@ -1,10 +1,10 @@
 import sys
 from pathlib import Path
 from PySide6.QtWidgets import QMainWindow, QApplication, QMessageBox, QListWidgetItem
-from test.ui_main import Ui_MainWindow  # Make sure the path to the Ui_MainWindow is correct
+from band_interface.ui_main import Ui_MainWindow  # Make sure the path to the Ui_MainWindow is correct
 from connector import Connector
-from test.emg_config_dialog import EMGConfigDialog
-from test.ui_functions import UIFunctions
+from band_interface.emg_config_dialog import EMGConfigDialog
+from band_interface.ui_functions import UIFunctions
 
 class MainWindow(QMainWindow):
     def __init__(self):
