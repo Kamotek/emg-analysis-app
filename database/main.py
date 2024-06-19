@@ -1,4 +1,4 @@
-from database.GoogleDriveManager import GoogleDriveManager
+from GoogleDriveManager import GoogleDriveManager
 
 
 def main():

@@ -1,17 +1,8 @@
-# connector.py
-
+from PySide6.QtCore import QObject, Signal
+from gforce import DataNotifFlags, GForceProfile, NotifDataType
 import struct
-import time
 import csv
-from test.gforce import DataNotifFlags, GForceProfile, NotifDataType
-
-# Callback functions
-def set_cmd_cb(resp):
-    print(f"Command result: {resp}")
-
-def get_firmware_version_cb(resp, firmware_version):
-    print(f"Command result: {resp}")
-    print(f"Firmware version: {firmware_version}")
+import time
 
 # Global file handlers and CSV writers for data logging
 quat_file = open("quaternion_data.csv", "w", newline='')
@@ -23,12 +14,20 @@ emg_writer = csv.writer(emg_file)
 gest_file = open("gesture_data.csv", "w", newline='')
 gest_writer = csv.writer(gest_file)
 
+# Callback functions
+def set_cmd_cb(resp):
+    print(f"Command result: {resp}")
+
+def get_firmware_version_cb(resp, firmware_version):
+    print(f"Command result: {resp}")
+    print(f"Firmware version: {firmware_version}")
+
 # Packet counter and start time for EMG data
 packet_cnt = 0
 start_time = 0
 
 # Data handling function
-def ondata(data):
+def ondata(data, connector):
     global packet_cnt, start_time
 
     if len(data) > 0:
@@ -37,6 +36,7 @@ def ondata(data):
             quaternion = [i[0] for i in quat_iter]
             print("quaternion:", quaternion)
             quat_writer.writerow(quaternion)
+            connector.quaternionDataReceived.emit(quaternion)  # Emitting signal for quaternion data
 
         elif data[0] == NotifDataType["NTF_EMG_ADC_DATA"] and len(data) == 129:
             if start_time == 0:
@@ -53,6 +53,7 @@ def ondata(data):
 
             emg_data = list(data[1:129])
             emg_writer.writerow(emg_data)
+            connector.emgDataReceived.emit(emg_data)  # Emitting signal for EMG data
 
         elif data[0] == NotifDataType["NTF_EMG_GEST_DATA"]:
             if len(data) == 2:
@@ -65,9 +66,13 @@ def ondata(data):
                 print(f"ges_id:{ges}  strength:{s}")
                 gest_writer.writerow([ges, s])
 
-# Connector class to handle device interactions
-class Connector:
+class Connector(QObject):
+    firmwareVersionReceived = Signal(str)
+    emgDataReceived = Signal(list)
+    quaternionDataReceived = Signal(list)
+
     def __init__(self):
+        super().__init__()
         self.GF = GForceProfile()
 
     def scan_devices(self):
@@ -75,13 +80,25 @@ class Connector:
         scan_results = self.GF.scan(5)
         if not scan_results:
             print("No devices found.")
-        return scan_results
+            return []
+
+        # Assuming scan_results is a list of tuples or lists with [idx, name, address]
+        devices = []
+        for device in scan_results:
+            devices.append({
+                'name': device[1],  # Assuming device[1] is the name
+                'address': device[2]  # Assuming device[2] is the address
+            })
+        return devices
 
     def connect_device(self, addr):
         self.GF.connect(addr)
         print(f"Connected to {addr}")
 
     def get_firmware_version(self):
+        def get_firmware_version_cb(resp, firmware_version):
+            self.firmwareVersionReceived.emit(firmware_version)
+
         self.GF.getControllerFirmwareVersion(get_firmware_version_cb, 1000)
 
     def toggle_led(self):
@@ -96,7 +113,7 @@ class Connector:
 
     def start_quaternion_notifications(self):
         self.GF.setDataNotifSwitch(DataNotifFlags["DNF_QUATERNION"], set_cmd_cb, 1000)
-        self.GF.startDataNotification(ondata)
+        self.GF.startDataNotification(lambda data: ondata(data, self))
 
     def stop_notifications(self):
         self.GF.stopDataNotification()
@@ -105,11 +122,15 @@ class Connector:
     def configure_emg_raw_data(self, sampRate, channelMask, dataLen, resolution):
         self.GF.setEmgRawDataConfig(sampRate, channelMask, dataLen, resolution, cb=set_cmd_cb, timeout=1000)
         self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_RAW"], set_cmd_cb, 1000)
-        self.GF.startDataNotification(ondata)
+        self.GF.startDataNotification(lambda data: ondata(data, self))
 
     def start_gesture_notifications(self, gesture_type):
         if gesture_type == 0:
             self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_GESTURE"], set_cmd_cb, 1000)
         else:
             self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_GESTURE_STRENGTH"], set_cmd_cb, 1000)
-        self.GF.startDataNotification(ondata)
+        self.GF.startDataNotification(lambda data: ondata(data, self))
+
+    def start_emg_notifications(self):
+        self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_ADC"], set_cmd_cb, 1000)
+        self.GF.startDataNotification(lambda data: ondata(data, self))
