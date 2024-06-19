@@ -178,10 +178,10 @@ class Ui_MainWindow(object):
         self.connect_btn = QtWidgets.QPushButton(self.page_1)
         self.connect_btn.setObjectName("connect_btn")
         self.verticalLayout_7.addWidget(self.connect_btn)
-        self.config_list = QtWidgets.QListWidget(self.page_1)
+        self.config_list = QtWidgets.QListView(self.page_1)
         self.config_list.setObjectName("config_list")
         self.verticalLayout_7.addWidget(self.config_list)
-        self.data_read = QtWidgets.QListWidget(self.page_1)
+        self.data_read = QtWidgets.QListView(self.page_1)
         self.data_read.setObjectName("data_read")
         self.verticalLayout_7.addWidget(self.data_read)
         self.verticalLayout_7.setStretch(4, 20)
@@ -244,14 +244,71 @@ class Ui_MainWindow(object):
         self.page_3.setObjectName("page_3")
         self.verticalLayout_8 = QtWidgets.QVBoxLayout(self.page_3)
         self.verticalLayout_8.setObjectName("verticalLayout_8")
-        self.label = QtWidgets.QLabel(self.page_3)
+        self.label_3 = QtWidgets.QLabel(self.page_3)
         font = QtGui.QFont()
-        font.setPointSize(40)
-        self.label.setFont(font)
-        self.label.setStyleSheet("color: #FFF;")
-        self.label.setAlignment(QtCore.Qt.AlignCenter)
-        self.label.setObjectName("label")
-        self.verticalLayout_8.addWidget(self.label)
+        font.setPointSize(24)
+        self.label_3.setFont(font)
+        self.label_3.setStyleSheet("color: #FFF;")
+        self.label_3.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_3.setObjectName("label_3")
+        self.verticalLayout_8.addWidget(self.label_3)
+        self.frame_classification_buttons = QtWidgets.QFrame(self.page_3)
+        self.frame_classification_buttons.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_classification_buttons.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_classification_buttons.setObjectName("frame_classification_buttons")
+        self.verticalLayout_9 = QtWidgets.QVBoxLayout(self.frame_classification_buttons)
+        self.verticalLayout_9.setObjectName("verticalLayout_9")
+        self.btn_rf = QtWidgets.QPushButton(self.frame_classification_buttons)
+        self.btn_rf.setStyleSheet("QPushButton {\n"
+"                                    color: #FFF;\n"
+"                                    background-color: #232323;\n"
+"                                    border: 1px solid #555;\n"
+"                                }\n"
+"                                QPushButton:hover {\n"
+"                                    background-color: #55AADD;\n"
+"                                }")
+        self.btn_rf.setObjectName("btn_rf")
+        self.verticalLayout_9.addWidget(self.btn_rf)
+        self.btn_lr = QtWidgets.QPushButton(self.frame_classification_buttons)
+        self.btn_lr.setStyleSheet("QPushButton {\n"
+"                                    color: #FFF;\n"
+"                                    background-color: #232323;\n"
+"                                    border: 1px solid #555;\n"
+"                                }\n"
+"                                QPushButton:hover {\n"
+"                                    background-color: #55AADD;\n"
+"                                }")
+        self.btn_lr.setObjectName("btn_lr")
+        self.verticalLayout_9.addWidget(self.btn_lr)
+        self.btn_svm = QtWidgets.QPushButton(self.frame_classification_buttons)
+        self.btn_svm.setStyleSheet("QPushButton {\n"
+"                                    color: #FFF;\n"
+"                                    background-color: #232323;\n"
+"                                    border: 1px solid #555;\n"
+"                                }\n"
+"                                QPushButton:hover {\n"
+"                                    background-color: #55AADD;\n"
+"                                }")
+        self.btn_svm.setObjectName("btn_svm")
+        self.verticalLayout_9.addWidget(self.btn_svm)
+        self.btn_rffs = QtWidgets.QPushButton(self.frame_classification_buttons)
+        self.btn_rffs.setStyleSheet("QPushButton {\n"
+"                                    color: #FFF;\n"
+"                                    background-color: #232323;\n"
+"                                    border: 1px solid #555;\n"
+"                                }\n"
+"                                QPushButton:hover {\n"
+"                                    background-color: #55AADD;\n"
+"                                }")
+        self.btn_rffs.setObjectName("btn_rffs")
+        self.verticalLayout_9.addWidget(self.btn_rffs)
+        self.verticalLayout_8.addWidget(self.frame_classification_buttons)
+        self.classification_results = QtWidgets.QListView(self.page_3)
+        self.classification_results.setStyleSheet("background-color: #373737;\n"
+"                    color: #FFF;\n"
+"                    border: 1px solid #55AADD;")
+        self.classification_results.setObjectName("classification_results")
+        self.verticalLayout_8.addWidget(self.classification_results)
         self.stackedWidget.addWidget(self.page_3)
         self.verticalLayout_5.addWidget(self.stackedWidget)
         self.horizontalLayout_2.addWidget(self.frame_pages)
@@ -287,4 +344,8 @@ class Ui_MainWindow(object):
         self.btn_upload.setText(_translate("MainWindow", "Upload Data"))
         self.btn_download.setText(_translate("MainWindow", "Download Data"))
         self.lineEdit_filters.setPlaceholderText(_translate("MainWindow", "Apply Filters..."))
-        self.label.setText(_translate("MainWindow", "PAGE 3"))
+        self.label_3.setText(_translate("MainWindow", "Select Classification Method"))
+        self.btn_rf.setText(_translate("MainWindow", "Random Forest Classification"))
+        self.btn_lr.setText(_translate("MainWindow", "Logistic Regression Classification"))
+        self.btn_svm.setText(_translate("MainWindow", "SVM Classification"))
+        self.btn_rffs.setText(_translate("MainWindow", "Amplified Random Forest Classification"))

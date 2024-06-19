@@ -451,20 +451,109 @@ QPushButton:hover {
             <widget class="QWidget" name="page_3">
              <layout class="QVBoxLayout" name="verticalLayout_8">
               <item>
-               <widget class="QLabel" name="label">
+               <widget class="QLabel" name="label_3">
                 <property name="font">
                  <font>
-                  <pointsize>40</pointsize>
+                  <pointsize>24</pointsize>
                  </font>
                 </property>
                 <property name="styleSheet">
                  <string notr="true">color: #FFF;</string>
                 </property>
                 <property name="text">
-                 <string>PAGE 3</string>
+                 <string>Select Classification Method</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QFrame" name="frame_classification_buttons">
+                <property name="frameShape">
+                 <enum>QFrame::StyledPanel</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Raised</enum>
+                </property>
+                <layout class="QVBoxLayout" name="verticalLayout_9">
+                 <item>
+                  <widget class="QPushButton" name="btn_rf">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+                                    color: #FFF;
+                                    background-color: #232323;
+                                    border: 1px solid #555;
+                                }
+                                QPushButton:hover {
+                                    background-color: #55AADD;
+                                }</string>
+                   </property>
+                   <property name="text">
+                    <string>Random Forest Classification</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btn_lr">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+                                    color: #FFF;
+                                    background-color: #232323;
+                                    border: 1px solid #555;
+                                }
+                                QPushButton:hover {
+                                    background-color: #55AADD;
+                                }</string>
+                   </property>
+                   <property name="text">
+                    <string>Logistic Regression Classification</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btn_svm">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+                                    color: #FFF;
+                                    background-color: #232323;
+                                    border: 1px solid #555;
+                                }
+                                QPushButton:hover {
+                                    background-color: #55AADD;
+                                }</string>
+                   </property>
+                   <property name="text">
+                    <string>SVM Classification</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QPushButton" name="btn_rffs">
+                   <property name="styleSheet">
+                    <string notr="true">QPushButton {
+                                    color: #FFF;
+                                    background-color: #232323;
+                                    border: 1px solid #555;
+                                }
+                                QPushButton:hover {
+                                    background-color: #55AADD;
+                                }</string>
+                   </property>
+                   <property name="text">
+                    <string>Amplified Random Forest Classification</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </widget>
+              </item>
+              <item>
+               <widget class="QListView" name="classification_results">
+                <property name="styleSheet">
+                 <string notr="true">background-color: #373737;
+                    color: #FFF;
+                    border: 1px solid #55AADD;</string>
                 </property>
                </widget>
               </item>
