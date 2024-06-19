@@ -4,6 +4,7 @@ from PySide6.QtCore import QObject, Signal
 from ui_main import Ui_MainWindow
 from connector import Connector
 from emg_config_dialog import EMGConfigDialog
+from ui_functions import UIFunctions
 
 
 class MainWindow(QMainWindow):
@@ -44,8 +45,8 @@ class MainWindow(QMainWindow):
         self.show()
 
     def toggle_menu(self):
-        # UIFunctions.toggle_menu(self, 220, True)  # 220 is the maximum width of the menu
-        pass  # Not sure about the implementation of this function
+        UIFunctions.toggle_menu(self, 220, True)  # 220 is the maximum width of the menu
+
 
     def scan_devices(self):
         self.devices = self.connector.scan_devices()
