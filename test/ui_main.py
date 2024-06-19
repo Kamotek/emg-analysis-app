@@ -178,10 +178,10 @@ class Ui_MainWindow(object):
         self.connect_btn = QtWidgets.QPushButton(self.page_1)
         self.connect_btn.setObjectName("connect_btn")
         self.verticalLayout_7.addWidget(self.connect_btn)
-        self.config_list = QtWidgets.QListView(self.page_1)
+        self.config_list = QtWidgets.QListWidget(self.page_1)
         self.config_list.setObjectName("config_list")
         self.verticalLayout_7.addWidget(self.config_list)
-        self.data_read = QtWidgets.QListView(self.page_1)
+        self.data_read = QtWidgets.QListWidget(self.page_1)
         self.data_read.setObjectName("data_read")
         self.verticalLayout_7.addWidget(self.data_read)
         self.verticalLayout_7.setStretch(4, 20)
@@ -259,7 +259,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(2)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
