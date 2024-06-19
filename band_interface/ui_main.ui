@@ -448,6 +448,9 @@ QPushButton:hover {
                   <property name="text">
                    <string>Local Files:</string>
                   </property>
+                                        <property name="styleSheet">
+      <string notr="true">color: white;</string>
+    </property>
                  </widget>
                 </item>
                 <item>
@@ -455,6 +458,9 @@ QPushButton:hover {
                   <property name="text">
                    <string>External Server Files:</string>
                   </property>
+                                        <property name="styleSheet">
+      <string notr="true">color: white;</string>
+    </property>
                  </widget>
                 </item>
                </layout>
@@ -490,6 +496,9 @@ QPushButton:hover {
                   <property name="text">
                    <string>Upload Data</string>
                   </property>
+                                        <property name="styleSheet">
+      <string notr="true">color: white;</string>
+    </property>
                  </widget>
                 </item>
                 <item>
@@ -497,6 +506,9 @@ QPushButton:hover {
                   <property name="text">
                    <string>Download Data</string>
                   </property>
+                                        <property name="styleSheet">
+      <string notr="true">color: white;</string>
+    </property>
                  </widget>
                 </item>
                </layout>
