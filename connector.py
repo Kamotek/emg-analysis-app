@@ -1,8 +1,15 @@
+import os
 from PySide6.QtCore import QObject, Signal
-from gforce import DataNotifFlags, GForceProfile, NotifDataType
+import classifiers_and_tests.classifier_svm
+import classifiers_and_tests.classifier_logistic_regression
+import classifiers_and_tests.classifier_tree_with_feature_selection
+import classifiers_and_tests.classifier_tree
+from visualizers import draw
+from band_interface.gforce import DataNotifFlags, GForceProfile, NotifDataType
 import struct
 import csv
 import time
+from pathlib import Path
 
 # Global file handlers and CSV writers for data logging
 quat_file = open("quaternion_data.csv", "w", newline='')
@@ -154,3 +161,39 @@ class Connector(QObject):
             self.GF.startDataNotification(lambda data: ondata(data, self))
         else:
             print("EMG configuration is not set. Call configure_emg_raw_data first.")
+
+
+    def random_forest_classification(self, data):
+        # Placeholder for classification logic
+        # Replace with actual RandomForest classification logic
+        return classifiers_and_tests.classifier_tree.main()
+    def logistic_regression_classification(self, data):
+        # Placeholder for classification logic
+        # Replace with actual Logistic Regression classification logic
+        return classifiers_and_tests.classifier_logistic_regression.main()
+
+    def svm_classification(self, data):
+        # Placeholder for classification logic
+        # Replace with actual SVM classification logic
+        return classifiers_and_tests.classifier_svm.main()
+
+    def amplified_random_forest_classification(self, data):
+        # Placeholder for classification logic
+        # Replace with actual Amplified Random Forest classification logic
+        return classifiers_and_tests.classifier_tree_with_feature_selection.main()
+    
+    base_path = Path("preprocessed_data/")
+    def get_all_csv_files(self):
+        csv_files = []
+        for file in self.base_path.rglob("*"):
+            if file.suffix == ".csv":
+                csv_files.append(file)
+        return csv_files
+    
+    def visualize_file(self, file_path):
+        try:
+            # Assuming draw_chart is defined in visualisations.draw module
+            draw.main(file_path)
+        except Exception as e:
+            print(f"Error visualizing file {file_path}: {e}")
+
