@@ -162,6 +162,10 @@ class Connector(QObject):
         else:
             print("EMG configuration is not set. Call configure_emg_raw_data first.")
 
+    def fetch_data(self):
+        # Placeholder for data fetching logic
+        # Replace with actual data fetching logic
+        return "Data fetched"
 
     def random_forest_classification(self, data):
         # Placeholder for classification logic
