@@ -1,4 +1,5 @@
 
+import io
 import os
 import numpy as np
 import pandas as pd
@@ -35,12 +36,10 @@ def main():
             
         return combined_data, label
 
-        return combined_data, label
-
     # Read data for individual names and datasets
     for name in names:
         for dataset in datasets:
-            data_folder = f'/home/kamil/Documents/Projects/emg-data-analysis/emg-data-analysis/preprocessed_data/{name}/{dataset}/features'
+            data_folder = get_data_folder(name, dataset)
             combined_data, label = read_wavelet_transform_data(data_folder, gender_labels[name])
             all_wavelet_data.append(combined_data)
             all_labels.append(label)
@@ -64,14 +63,45 @@ def main():
 
     # Predict on the test set
     y_pred = svm_clf.predict(X_test)
+    # Redirect print output to a string
+    output = io.StringIO()
 
-    # Evaluate the classifier
-    print("Classification Report for SVM:")
-    print(classification_report(y_test, y_pred))
+    # Write the classification report with newlines
+    output.write("Classification Report for SVM:\n")
+    output.write(classification_report(y_test, y_pred))
+    output.write("\n")
 
-    # Cross-validation score
+    # Write cross-validation score with newline
     cv_scores_svm = cross_val_score(svm_clf, X, y, cv=5)
-    print("CV Average Score for SVM:", cv_scores_svm.mean())
+    output.write("CV Average Score for SVM: ")
+    output.write(f"{cv_scores_svm.mean()}\n")
+
+    result = output.getvalue()
+    output.close()
+
+    return result
+
+
+def get_data_folder(name, dataset):
+    # Get the current script's directory
+    base_dir = os.path.dirname(__file__)
+    
+    # Construct the relative path
+    relative_path = os.path.join(
+        base_dir,
+        '..',  # Move up one directory
+        'preprocessed_data',
+        name,
+        f'{dataset}',
+        'features'  # Adjust the dataset part as requested
+    )
+
+    # Normalize the path to remove any redundant separators
+    data_folder = os.path.normpath(relative_path)
+    
+    return data_folder
+
+
 
 if __name__ == '__main__':
     main()

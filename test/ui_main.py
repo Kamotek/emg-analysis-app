@@ -122,6 +122,18 @@ class Ui_MainWindow(object):
 "}")
         self.btn_page_3.setObjectName("btn_page_3")
         self.verticalLayout_4.addWidget(self.btn_page_3)
+        self.btn_page_4 = QtWidgets.QPushButton(self.frame_top_menus)
+        self.btn_page_4.setMinimumSize(QtCore.QSize(0, 40))
+        self.btn_page_4.setStyleSheet("QPushButton {\n"
+"    color: rgb(255, 255, 255);\n"
+"    background-color: rgb(35, 35, 35);\n"
+"    border: 0px solid;\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgb(85, 170, 255);\n"
+"}")
+        self.btn_page_4.setObjectName("btn_page_4")
+        self.verticalLayout_4.addWidget(self.btn_page_4)
         self.verticalLayout_3.addWidget(self.frame_top_menus, 0, QtCore.Qt.AlignTop)
         self.horizontalLayout_2.addWidget(self.frame_left_menu)
         self.frame_pages = QtWidgets.QFrame(self.Content)
@@ -178,10 +190,10 @@ class Ui_MainWindow(object):
         self.connect_btn = QtWidgets.QPushButton(self.page_1)
         self.connect_btn.setObjectName("connect_btn")
         self.verticalLayout_7.addWidget(self.connect_btn)
-        self.config_list = QtWidgets.QListView(self.page_1)
+        self.config_list = QtWidgets.QListWidget(self.page_1)
         self.config_list.setObjectName("config_list")
         self.verticalLayout_7.addWidget(self.config_list)
-        self.data_read = QtWidgets.QListView(self.page_1)
+        self.data_read = QtWidgets.QListWidget(self.page_1)
         self.data_read.setObjectName("data_read")
         self.verticalLayout_7.addWidget(self.data_read)
         self.verticalLayout_7.setStretch(4, 20)
@@ -303,20 +315,74 @@ class Ui_MainWindow(object):
         self.btn_rffs.setObjectName("btn_rffs")
         self.verticalLayout_9.addWidget(self.btn_rffs)
         self.verticalLayout_8.addWidget(self.frame_classification_buttons)
-        self.classification_results = QtWidgets.QListView(self.page_3)
+        self.classification_results = QtWidgets.QListWidget(self.page_3)
         self.classification_results.setStyleSheet("background-color: #373737;\n"
 "                    color: #FFF;\n"
 "                    border: 1px solid #55AADD;")
         self.classification_results.setObjectName("classification_results")
         self.verticalLayout_8.addWidget(self.classification_results)
         self.stackedWidget.addWidget(self.page_3)
+        self.page_4 = QtWidgets.QWidget()
+        self.page_4.setObjectName("page_4")
+        self.verticalLayout_91 = QtWidgets.QVBoxLayout(self.page_4)
+        self.verticalLayout_91.setObjectName("verticalLayout_91")
+        self.label_4 = QtWidgets.QLabel(self.page_4)
+        font = QtGui.QFont()
+        font.setPointSize(24)
+        self.label_4.setFont(font)
+        self.label_4.setStyleSheet("color: #FFF;")
+        self.label_4.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_4.setObjectName("label_4")
+        self.verticalLayout_91.addWidget(self.label_4)
+        self.frame_data_visualization_buttons = QtWidgets.QFrame(self.page_4)
+        self.frame_data_visualization_buttons.setFrameShape(QtWidgets.QFrame.StyledPanel)
+        self.frame_data_visualization_buttons.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.frame_data_visualization_buttons.setObjectName("frame_data_visualization_buttons")
+        self.horizontalLayout_9 = QtWidgets.QHBoxLayout(self.frame_data_visualization_buttons)
+        self.horizontalLayout_9.setObjectName("horizontalLayout_9")
+        self.btn_refresh = QtWidgets.QPushButton(self.frame_data_visualization_buttons)
+        self.btn_refresh.setStyleSheet("QPushButton {\n"
+"                color: #FFF;\n"
+"                background-color: #232323;\n"
+"                border: 1px solid #555;\n"
+"            }\n"
+"            QPushButton:hover {\n"
+"                background-color: #55AADD;\n"
+"            }")
+        self.btn_refresh.setObjectName("btn_refresh")
+        self.horizontalLayout_9.addWidget(self.btn_refresh)
+        self.btn_draw_chart = QtWidgets.QPushButton(self.frame_data_visualization_buttons)
+        self.btn_draw_chart.setStyleSheet("QPushButton {\n"
+"                color: #FFF;\n"
+"                background-color: #232323;\n"
+"                border: 1px solid #555;\n"
+"            }\n"
+"            QPushButton:hover {\n"
+"                background-color: #55AADD;\n"
+"            }")
+        self.btn_draw_chart.setObjectName("btn_draw_chart")
+        self.horizontalLayout_9.addWidget(self.btn_draw_chart)
+        self.verticalLayout_91.addWidget(self.frame_data_visualization_buttons)
+        self.data_list = QtWidgets.QListWidget(self.page_4)
+        self.data_list.setStyleSheet("background-color: #373737;\n"
+"        color: #FFF;\n"
+"        border: 1px solid #55AADD;")
+        self.data_list.setObjectName("data_list")
+        self.verticalLayout_91.addWidget(self.data_list)
+        self.chart_area = QtWidgets.QWidget(self.page_4)
+        self.chart_area.setMinimumSize(QtCore.QSize(0, 200))
+        self.chart_area.setStyleSheet("background-color: #232323;\n"
+"        border: 1px solid #55AADD;")
+        self.chart_area.setObjectName("chart_area")
+        self.verticalLayout_91.addWidget(self.chart_area)
+        self.stackedWidget.addWidget(self.page_4)
         self.verticalLayout_5.addWidget(self.stackedWidget)
         self.horizontalLayout_2.addWidget(self.frame_pages)
         self.verticalLayout.addWidget(self.Content)
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(2)
+        self.stackedWidget.setCurrentIndex(3)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -325,7 +391,8 @@ class Ui_MainWindow(object):
         self.Btn_Toggle.setText(_translate("MainWindow", "TOGGLE"))
         self.btn_page_1.setText(_translate("MainWindow", "Band Interface"))
         self.btn_page_2.setText(_translate("MainWindow", "Data Management"))
-        self.btn_page_3.setText(_translate("MainWindow", "Data Classification"))
+        self.btn_page_3.setText(_translate("MainWindow", "Data Visualization"))
+        self.btn_page_4.setText(_translate("MainWindow", "Data Classification"))
         self.firmware_btn.setText(_translate("MainWindow", "Get Firmware Version"))
         self.led_btn.setText(_translate("MainWindow", "Toggle LED"))
         self.raw_emg_button.setText(_translate("MainWindow", "Get RAW EMG Data"))
@@ -349,3 +416,6 @@ class Ui_MainWindow(object):
         self.btn_lr.setText(_translate("MainWindow", "Logistic Regression Classification"))
         self.btn_svm.setText(_translate("MainWindow", "SVM Classification"))
         self.btn_rffs.setText(_translate("MainWindow", "Amplified Random Forest Classification"))
+        self.label_4.setText(_translate("MainWindow", "Data Visualization"))
+        self.btn_refresh.setText(_translate("MainWindow", "Refresh List"))
+        self.btn_draw_chart.setText(_translate("MainWindow", "Draw Chart"))

@@ -3,9 +3,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def main():
+def main(file_path):
     # Path to the dataset file
-    dataset_file = 'preprocessed_data/Darina/dataset_1/kalman_filtered_emg_data.csv'
+    dataset_file = file_path
     # Read the dataset into a pandas DataFrame without a header
     df = pd.read_csv(dataset_file, header=None)
 
