@@ -16,6 +16,7 @@ class GoogleDriveManager:
         self.app_folder_id = self.ensure_app_folder()
 
     def authenticate_persistently(self):
+        """ Login to Google Drive and save the credentials securely to a file."""
         credentials_path = self.gauth.settings.get('save_credentials_file')
 
         if os.path.exists(credentials_path):
@@ -31,29 +32,52 @@ class GoogleDriveManager:
         self.gauth.SaveCredentialsFile(credentials_path)
 
     def ensure_app_folder(self):
-        folder_id = self.get_folder_id()
+        folder_id = self.get_folder_IDs(self.app_folder_name, 'root')
 
         if folder_id is None:
-            folder_id = self.create_folder()
+            folder_id = self.create_folder(self.app_folder_name, 'root')
 
         return folder_id
 
-    def get_folder_id(self, folder_path=None, parent_folder_id='root'):  # TODO nested folders
-        if not folder_path:
-            folder_path = self.app_folder_name
+    def get_folder_IDs(self, folder_name, parent_folder_id=None, is_recursive=False):
+        """
+        Get the folder ID of the folder with the given name.
+        :param folder_name:
+        :param parent_folder_id: Folder ID being the search starting point. The default is the app folder.
+        :param is_recursive: If True, search for the folder in all subfolders.
+        :return: Folder ID if found, None otherwise. List of IDs if is_recursive is True.
+        :raises: AssertionError if multiple folders with the same name in a single folder are found.
+        """
+        folder_name = folder_name or self.app_folder_name
+        parent_folder_id = parent_folder_id or self.app_folder_id
 
-        query = f"title='{self.app_folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+        query = f"title='{folder_name}' and mimeType='application/vnd.google-apps.folder' and trashed=false"
+        if not is_recursive:
+            query += f" and '{parent_folder_id}' in parents"
+
         file_list = self.drive.ListFile({'q': query}).GetList()
-        assert not len(file_list) > 1, 'Multiple folders with the same name found'
+
+        assert not len(file_list) > 1 and not is_recursive, 'Multiple folders with the same name found'
 
         if file_list:
-            folder_id = file_list[0]['id']
-            return folder_id
+            if not is_recursive:
+                return file_list[0]['id']
+
+            folder_ids = [file['id'] for file in file_list]
+            return folder_ids
         return None
 
-    def create_folder(self, parents_folder_id='root'):
+    def create_folder(self, folder_name, parents_folder_id=None):
+        """
+        Create a folder with the given name.
+        :param folder_name:
+        :param parents_folder_id: By default, the app folder is the parent.
+        :return: New folder's ID.
+        """
+        parents_folder_id = parents_folder_id or self.app_folder_id
+
         folder_metadata = {
-            'title': self.app_folder_name,
+            'title': folder_name,
             'mimeType': 'application/vnd.google-apps.folder',
             'parents': [{'id': parents_folder_id}]
         }
