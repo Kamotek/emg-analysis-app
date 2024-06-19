@@ -1,10 +1,34 @@
 import sys
 from pathlib import Path
-from PySide6.QtWidgets import QMainWindow, QApplication, QMessageBox, QListWidgetItem, QDialog
+from PySide6.QtWidgets import QMainWindow, QApplication, QMessageBox, QListWidgetItem, QDialog, QVBoxLayout, QWidget
 from band_interface.ui_main import Ui_MainWindow  # Make sure the path to the Ui_MainWindow is correct
 from connector import Connector
 from band_interface.emg_config_dialog import EMGConfigDialog
 from band_interface.ui_functions import UIFunctions
+
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+
+
+# class ChartArea(QWidget):
+#     def __init__(self, parent=None):
+#         super().__init__(parent)
+#         self.layout = QVBoxLayout(self)
+#         self.setLayout(self.layout)
+#         self.canvas = None  # Initialize canvas attribute
+
+#     def set_chart(self, fig):
+#         # Clear the layout first
+#         while self.layout.count() > 0:
+#             item = self.layout.takeAt(0)
+#             widget = item.widget()
+#             if widget:
+#                 widget.deleteLater()
+
+#         # Create a new FigureCanvas and add it to the layout
+#         self.canvas = FigureCanvas(fig)
+#         self.layout.addWidget(self.canvas)
+#         self.canvas.draw()  # Explicitly draw the canvas
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -13,6 +37,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         self.connector = Connector()
+        #self.chart_area = ChartArea(self.ui.chart_area)  # Assuming ui.chart_area is a placeholder QWidget
 
         # Connect UI buttons to methods (unchanged from your original code)
         self.ui.Btn_Toggle.clicked.connect(lambda: self.toggle_menu())
@@ -45,6 +70,7 @@ class MainWindow(QMainWindow):
 
         self.ui.btn_refresh.clicked.connect(self.load_files)
         self.ui.btn_draw_chart.clicked.connect(self.draw_chart)
+        
 
         self.devices = []  # List to store scanned devices
         self.show()
@@ -130,7 +156,7 @@ class MainWindow(QMainWindow):
         for file_path in csv_files:
             item = QListWidgetItem(str(file_path))
             self.ui.data_list.addItem(item)
-
+            
     def draw_chart(self):
         selected_items = self.ui.data_list.selectedItems()
         if not selected_items:
@@ -138,7 +164,19 @@ class MainWindow(QMainWindow):
             return
 
         selected_file = selected_items[0].text()
-        self.connector.visualize_file(selected_file)
+        fig = self.connector.visualize_file(selected_file)
+
+        if fig is None:
+            QMessageBox.warning(self, "Draw Chart", "Failed to generate chart.")
+            return
+
+        fig.show()
+        # # Set the chart on the existing chart_area instance
+        # self.chart_area.set_chart(fig)
+        
+        # # Show the chart area widget
+        # self.chart_area.show()
+
 
     def classify_data(self, method):
         data = self.connector.fetch_data()

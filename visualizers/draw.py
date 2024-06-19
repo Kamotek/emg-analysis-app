@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
+import matplotlib
+
+
 
 def main(file_path):
     # Path to the dataset file
@@ -9,17 +12,11 @@ def main(file_path):
     # Read the dataset into a pandas DataFrame without a header
     df = pd.read_csv(dataset_file, header=None)
 
-    # Print the first few rows to inspect the data
-    print(df.head())
-
     # Assuming the EMG data starts from the first column and goes onward
     # Rename the columns to reflect EMG channels (e.g., 'emg1', 'emg2', etc.)
     num_columns = df.shape[1]
     column_names = [f'emg{i+1}' for i in range(num_columns)]
     df.columns = column_names
-
-    # Print the columns of the DataFrame to confirm
-    print("Columns in the dataset:", df.columns)
 
     # Assuming we are interested in all EMG channels for analysis
     # Combine all columns into a single series for processing
@@ -41,14 +38,14 @@ def main(file_path):
     print(f'SNR: {snr:.2f} dB')
 
     # Visualize the EMG data
-    plt.figure(figsize=(12, 6))
-    plt.plot(emg_signal, label='Raw EMG Signal')
-    plt.title('Raw EMG Signal')
-    plt.xlabel('Sample Number')
-    plt.ylabel('Amplitude')
-    plt.legend()
-    plt.show()
+    fig, ax = plt.subplots(figsize=(12, 6))
+    ax.plot(emg_signal, label='Raw EMG Signal')
+    ax.set_title('Raw EMG Signal')
+    ax.set_xlabel('Sample Number')
+    ax.set_ylabel('Amplitude')
+    ax.legend()
 
+    return fig  # Return the matplotlib figure object
 
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    pass  # Display the plot

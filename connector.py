@@ -140,6 +140,7 @@ class Connector(QObject):
         self.channelMask = channelMask
         self.dataLen = dataLen
         self.resolution = resolution
+        #---
         self.age = age
         self.gender = gender
         self.height = height
@@ -206,7 +207,7 @@ class Connector(QObject):
     def visualize_file(self, file_path):
         try:
             # Assuming draw_chart is defined in visualisations.draw module
-            draw.main(file_path)
+            return draw.main(file_path)
         except Exception as e:
             print(f"Error visualizing file {file_path}: {e}")
 
