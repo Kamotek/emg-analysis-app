@@ -150,18 +150,14 @@ class Connector(QObject):
         if self.sampRate is not None and self.channelMask is not None and self.dataLen is not None and self.resolution is not None:
             self.GF.setEmgRawDataConfig(self.sampRate, self.channelMask, self.dataLen, self.resolution, cb=set_cmd_cb, timeout=1000)
             self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_RAW"], set_cmd_cb, 1000)
+
+            global emg_file, emg_writer
+            emg_file = open(self.create_next_folder() / "emg_raw_data.csv", "w", newline='')
+            emg_writer = csv.writer(emg_file)
+
             self.GF.startDataNotification(lambda data: ondata(data, self))
         else:
             print("EMG configuration is not set. Call configure_emg_raw_data first.")
-
-    def get_raw_emg(self):
-        if self.sampRate is not None and self.channelMask is not None and self.dataLen is not None and self.resolution is not None:
-            self.GF.setEmgRawDataConfig(self.sampRate, self.channelMask, self.dataLen, self.resolution, cb=set_cmd_cb, timeout=1000)
-            self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_RAW"], set_cmd_cb, 1000)
-            self.GF.startDataNotification(lambda data: ondata(data, self))
-        else:
-            print("EMG configuration is not set. Call configure_emg_raw_data first.")
-
 
     def random_forest_classification(self, data):
         # Placeholder for classification logic
@@ -197,3 +193,24 @@ class Connector(QObject):
         except Exception as e:
             print(f"Error visualizing file {file_path}: {e}")
 
+    def create_next_folder(base_path='data'):
+        base_path = Path(base_path)
+        # Ensure the base path exists
+        base_path.mkdir(parents=True, exist_ok=True)
+
+        # Get all subdirectories in the base path
+        subdirs = [d for d in base_path.iterdir() if d.is_dir() and d.name.startswith('d') and d.name[1:].isdigit()]
+
+        if not subdirs:
+            # If no subdirectories, create d1
+            new_folder_name = 'd1'
+        else:
+            # Get the highest numbered folder
+            last_folder = max(subdirs, key=lambda d: int(d.name[1:]))
+            last_number = int(last_folder.name[1:])
+            new_folder_name = f'd{last_number + 1}'
+
+        new_folder_path = base_path / new_folder_name
+        new_folder_path.mkdir()
+
+        return new_folder_path
