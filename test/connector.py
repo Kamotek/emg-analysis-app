@@ -74,6 +74,10 @@ class Connector(QObject):
     def __init__(self):
         super().__init__()
         self.GF = GForceProfile()
+        self.sampRate = None
+        self.channelMask = None
+        self.dataLen = None
+        self.resolution = None
 
     def scan_devices(self):
         print("Scanning devices...")
@@ -120,9 +124,13 @@ class Connector(QObject):
         self.GF.setDataNotifSwitch(DataNotifFlags["DNF_OFF"], set_cmd_cb, 1000)
 
     def configure_emg_raw_data(self, sampRate, channelMask, dataLen, resolution):
+        self.sampRate = sampRate
+        self.channelMask = channelMask
+        self.dataLen = dataLen
+        self.resolution = resolution
+        
         self.GF.setEmgRawDataConfig(sampRate, channelMask, dataLen, resolution, cb=set_cmd_cb, timeout=1000)
-        self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_RAW"], set_cmd_cb, 1000)
-        self.GF.startDataNotification(lambda data: ondata(data, self))
+
 
     def start_gesture_notifications(self, gesture_type):
         if gesture_type == 0:
@@ -132,5 +140,17 @@ class Connector(QObject):
         self.GF.startDataNotification(lambda data: ondata(data, self))
 
     def start_emg_notifications(self):
-        self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_ADC"], set_cmd_cb, 1000)
-        self.GF.startDataNotification(lambda data: ondata(data, self))
+        if self.sampRate is not None and self.channelMask is not None and self.dataLen is not None and self.resolution is not None:
+            self.GF.setEmgRawDataConfig(self.sampRate, self.channelMask, self.dataLen, self.resolution, cb=set_cmd_cb, timeout=1000)
+            self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_RAW"], set_cmd_cb, 1000)
+            self.GF.startDataNotification(lambda data: ondata(data, self))
+        else:
+            print("EMG configuration is not set. Call configure_emg_raw_data first.")
+
+    def get_raw_emg(self):
+        if self.sampRate is not None and self.channelMask is not None and self.dataLen is not None and self.resolution is not None:
+            self.GF.setEmgRawDataConfig(self.sampRate, self.channelMask, self.dataLen, self.resolution, cb=set_cmd_cb, timeout=1000)
+            self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_RAW"], set_cmd_cb, 1000)
+            self.GF.startDataNotification(lambda data: ondata(data, self))
+        else:
+            print("EMG configuration is not set. Call configure_emg_raw_data first.")
