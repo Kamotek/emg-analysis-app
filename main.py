@@ -96,7 +96,11 @@ class MainWindow(QMainWindow):
                 sampRate=config['sample_rate'],
                 channelMask=config['channel_mask'],
                 dataLen=config['data_length'],
-                resolution=config['resolution']
+                resolution=config['resolution'],
+                gender=config['gender'],
+                age=config['age'],
+                height=config['height'],
+                weight=config['weight']
             )
 
     def start_gesture_notifications(self, gesture_type):
