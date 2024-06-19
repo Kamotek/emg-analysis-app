@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from PySide6.QtWidgets import QMainWindow, QApplication, QMessageBox, QListWidgetItem
+from PySide6.QtWidgets import QMainWindow, QApplication, QMessageBox, QListWidgetItem, QDialog
 from band_interface.ui_main import Ui_MainWindow  # Make sure the path to the Ui_MainWindow is correct
 from connector import Connector
 from band_interface.emg_config_dialog import EMGConfigDialog
