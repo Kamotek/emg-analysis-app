@@ -1,15 +1,17 @@
-import os
-from PySide6.QtCore import QObject, Signal
-import classifiers_and_tests.classifier_svm
-import classifiers_and_tests.classifier_logistic_regression
-import classifiers_and_tests.classifier_tree_with_feature_selection
-import classifiers_and_tests.classifier_tree
-from visualizers import draw
-from band_interface.gforce import DataNotifFlags, GForceProfile, NotifDataType
-import struct
 import csv
+import struct
 import time
 from pathlib import Path
+
+import yaml
+from PySide6.QtCore import QObject, Signal
+
+import classifiers_and_tests.classifier_logistic_regression
+import classifiers_and_tests.classifier_svm
+import classifiers_and_tests.classifier_tree
+import classifiers_and_tests.classifier_tree_with_feature_selection
+from band_interface.gforce import DataNotifFlags, GForceProfile, NotifDataType
+from visualizers import draw
 
 # Global file handlers and CSV writers for data logging
 quat_file = open("quaternion_data.csv", "w", newline='')
@@ -21,17 +23,23 @@ emg_writer = csv.writer(emg_file)
 gest_file = open("gesture_data.csv", "w", newline='')
 gest_writer = csv.writer(gest_file)
 
+data_folder_new_path = None
+
+
 # Callback functions
 def set_cmd_cb(resp):
     print(f"Command result: {resp}")
+
 
 def get_firmware_version_cb(resp, firmware_version):
     print(f"Command result: {resp}")
     print(f"Firmware version: {firmware_version}")
 
+
 # Packet counter and start time for EMG data
 packet_cnt = 0
 start_time = 0
+
 
 # Data handling function
 def ondata(data, connector):
@@ -73,6 +81,7 @@ def ondata(data, connector):
                 print(f"ges_id:{ges}  strength:{s}")
                 gest_writer.writerow([ges, s])
 
+
 class Connector(QObject):
     firmwareVersionReceived = Signal(str)
     emgDataReceived = Signal(list)
@@ -89,7 +98,6 @@ class Connector(QObject):
         self.gender = None
         self.height = None
         self.weight = None
-
 
     def scan_devices(self):
         print("Scanning devices...")
@@ -147,6 +155,20 @@ class Connector(QObject):
 
         self.GF.setEmgRawDataConfig(sampRate, channelMask, dataLen, resolution, cb=set_cmd_cb, timeout=1000)
 
+    def store_metadata(self):
+        config_dict = {
+            "sampRate": self.sampRate,
+            "channelMask": self.channelMask,
+            "dataLen": self.dataLen,
+            "resolution": self.resolution,
+            "age": self.age,
+            "gender": self.gender,
+            "height": self.height,
+            "weight": self.weight
+        }
+
+        with open(data_folder_new_path / "config.yaml", 'w') as yaml_file:
+            yaml.dump(config_dict, yaml_file, default_flow_style=False)
 
     def start_gesture_notifications(self, gesture_type):
         if gesture_type == 0:
@@ -157,11 +179,15 @@ class Connector(QObject):
 
     def start_emg_notifications(self):
         if self.sampRate is not None and self.channelMask is not None and self.dataLen is not None and self.resolution is not None:
-            self.GF.setEmgRawDataConfig(self.sampRate, self.channelMask, self.dataLen, self.resolution, cb=set_cmd_cb, timeout=1000)
+            self.GF.setEmgRawDataConfig(self.sampRate, self.channelMask, self.dataLen, self.resolution, cb=set_cmd_cb,
+                                        timeout=1000)
             self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_RAW"], set_cmd_cb, 1000)
 
-            global emg_file, emg_writer
-            emg_file = open(self.create_next_folder() / "emg_raw_data.csv", "w", newline='')
+            global emg_file, emg_writer, data_folder_new_path
+            data_folder_new_path = self.create_next_folder()
+
+            self.store_metadata()
+            emg_file = open(data_folder_new_path / "emg_raw_data.csv", "w", newline='')
             emg_writer = csv.writer(emg_file)
 
             self.GF.startDataNotification(lambda data: ondata(data, self))
@@ -177,6 +203,7 @@ class Connector(QObject):
         # Placeholder for classification logic
         # Replace with actual RandomForest classification logic
         return classifiers_and_tests.classifier_tree.main()
+
     def logistic_regression_classification(self, data):
         # Placeholder for classification logic
         # Replace with actual Logistic Regression classification logic
@@ -191,15 +218,16 @@ class Connector(QObject):
         # Placeholder for classification logic
         # Replace with actual Amplified Random Forest classification logic
         return classifiers_and_tests.classifier_tree_with_feature_selection.main()
-    
+
     base_path = Path("preprocessed_data/")
+
     def get_all_csv_files(self):
         csv_files = []
         for file in self.base_path.rglob("*"):
             if file.suffix == ".csv":
                 csv_files.append(file)
         return csv_files
-    
+
     def visualize_file(self, file_path):
         try:
             # Assuming draw_chart is defined in visualisations.draw module
@@ -207,7 +235,7 @@ class Connector(QObject):
         except Exception as e:
             print(f"Error visualizing file {file_path}: {e}")
 
-    def create_next_folder(base_path='data'):
+    def create_next_folder(self, base_path='data'):
         base_path = Path(base_path)
         # Ensure the base path exists
         base_path.mkdir(parents=True, exist_ok=True)
