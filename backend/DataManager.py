@@ -7,6 +7,12 @@ import yaml
 
 
 class DataManager:
+    """
+    A class that manages the storage and retrieval of EMG data and metadata.
+
+    It uses pickle and gzip for data serialization and compression, and yaml for metadata serialization.
+    This way, the data can be stored in a compact and efficient way.
+    """
     def __init__(self):
         self.PROJECT_PATH = Path(__file__).parent.parent
         assert self.PROJECT_PATH.name == 'emg-analysis-app', 'Project path is not as expected'

@@ -10,6 +10,8 @@ import classifiers_and_tests.classifier_logistic_regression
 import classifiers_and_tests.classifier_svm
 import classifiers_and_tests.classifier_tree
 import classifiers_and_tests.classifier_tree_with_feature_selection
+from backend.DataManager import DataManager
+from backend.EMGSignal import EMGSignal
 from band_interface.gforce import DataNotifFlags, GForceProfile, NotifDataType
 from visualizers import draw
 
@@ -22,8 +24,6 @@ emg_writer = csv.writer(emg_file)
 
 gest_file = open("gesture_data.csv", "w", newline='')
 gest_writer = csv.writer(gest_file)
-
-data_folder_new_path = None
 
 
 # Callback functions
@@ -67,7 +67,10 @@ def ondata(data, connector):
                 start_time = time.time()
 
             emg_data = list(data[1:129])
-            emg_writer.writerow(emg_data)
+            #emg_writer.writerow(emg_data)
+
+            connector.emg_signal.add_data_row(emg_data)
+
             connector.emgDataReceived.emit(emg_data)  # Emitting signal for EMG data
 
         elif data[0] == NotifDataType["NTF_EMG_GEST_DATA"]:
@@ -98,6 +101,9 @@ class Connector(QObject):
         self.gender = None
         self.height = None
         self.weight = None
+
+        self.data_manager = DataManager()
+        self.emg_signal = None
 
     def scan_devices(self):
         print("Scanning devices...")
@@ -143,6 +149,12 @@ class Connector(QObject):
         self.GF.stopDataNotification()
         self.GF.setDataNotifSwitch(DataNotifFlags["DNF_OFF"], set_cmd_cb, 1000)
 
+        data = self.emg_signal.signal
+        metadata = self.metadata_from_band_config()
+        self.data_manager.store_dataset(data, metadata)
+        self.emg_signal = None  # Free the memory
+
+
     def configure_emg_raw_data(self, sampRate, channelMask, dataLen, resolution, age, gender, height, weight):
         self.sampRate = sampRate
         self.channelMask = channelMask
@@ -156,20 +168,21 @@ class Connector(QObject):
 
         self.GF.setEmgRawDataConfig(sampRate, channelMask, dataLen, resolution, cb=set_cmd_cb, timeout=1000)
 
-    def store_metadata(self):
-        config_dict = {
-            "sampRate": self.sampRate,
-            "channelMask": self.channelMask,
-            "dataLen": self.dataLen,
-            "resolution": self.resolution,
-            "age": self.age,
-            "gender": self.gender,
-            "height": self.height,
-            "weight": self.weight
+    def metadata_from_band_config(self):
+        return {
+            'band': {
+                'sampRate': self.sampRate,
+                'channelMask': self.channelMask,
+                'dataLen': self.dataLen,
+                'resolution': self.resolution
+            },
+            'subject': {
+                "age": self.age,
+                "gender": self.gender,
+                "height": self.height,
+                "weight": self.weight
+            }
         }
-
-        with open(data_folder_new_path / "config.yaml", 'w') as yaml_file:
-            yaml.dump(config_dict, yaml_file, default_flow_style=False)
 
     def start_gesture_notifications(self, gesture_type):
         if gesture_type == 0:
@@ -184,12 +197,7 @@ class Connector(QObject):
                                         timeout=1000)
             self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_RAW"], set_cmd_cb, 1000)
 
-            global emg_file, emg_writer, data_folder_new_path
-            data_folder_new_path = self.create_next_folder()
-
-            self.store_metadata()
-            emg_file = open(data_folder_new_path / "emg_raw_data.csv", "w", newline='')
-            emg_writer = csv.writer(emg_file)
+            self.emg_signal = EMGSignal(channels=self.dataLen, sample_rate=self.sampRate)
 
             self.GF.startDataNotification(lambda data: ondata(data, self))
         else:

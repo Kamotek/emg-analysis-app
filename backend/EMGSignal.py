@@ -4,6 +4,16 @@ import pandas as pd
 
 
 class EMGSignal:
+    """
+    A wrapper around a pandas DataFrame that represents an EMG signal.
+    It also provides a way to stream the signal data (not fully implemented).
+
+    In the future, it could be extended to provide more advanced signal processing methods
+    (filters, feature extraction, etc.).
+
+    The signal is a time series of EMG data, where each row represents a moment in time
+    and each column represents the signal value for a specific channel.
+    """
     def __init__(self, channels, sample_rate):
         self.channels = channels
         self.sample_rate = sample_rate
