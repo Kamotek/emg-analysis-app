@@ -18,11 +18,11 @@ class DataManager:
 
         self.BAND_ASSETS_PATH.mkdir(parents=True, exist_ok=True)
 
-    def _dataset_folder(self, dataset_id: str) -> Path:
+    def _DATASET_FOLDER(self, dataset_id: str) -> Path:
         return self.BAND_ASSETS_PATH / dataset_id
 
     def load_data(self, dataset_id: str, file_name: str = 'emg_raw_data') -> pd.DataFrame:
-        dataset_folder = self._dataset_folder(dataset_id)
+        dataset_folder = self._DATASET_FOLDER(dataset_id)
         if not dataset_folder.exists():
             raise ValueError(f'Dataset {dataset_id} does not exist')
 
@@ -31,7 +31,7 @@ class DataManager:
                 return pickle.load(f)
 
     def load_metadata(self, dataset_id: str) -> dict:
-        metadata_path = self._dataset_folder(dataset_id) / 'metadata.yaml'
+        metadata_path = self._DATASET_FOLDER(dataset_id) / 'metadata.yaml'
         if not metadata_path.exists():
             raise ValueError(f'Metadata for dataset {dataset_id} does not exist')
         else:
@@ -41,20 +41,20 @@ class DataManager:
     def store_dataset(self, data: pd.DataFrame, metadata: dict, data_name: str = 'emg_raw_data', metadata_name: str = 'metadata'):
         dataset_folder = self._create_new_dataset_folder()
 
-        self._store_data(data, dataset_folder.name, data_name)
-        self._store_metadata(metadata, dataset_folder.name, metadata_name)
+        self._store_data(data, dataset_folder, data_name)
+        self._store_metadata(metadata, dataset_folder, metadata_name)
 
-    def _store_data(self, data: pd.DataFrame, dataset_id: str, file_name: str):
-        with gzip.open(self._dataset_folder(dataset_id) / f'{file_name}{self.DATA_FORMAT}', 'wb') as f:
+    def _store_data(self, data: pd.DataFrame, dataset_folder: Path, file_name: str):
+        with gzip.open(dataset_folder / f'{file_name}{self.DATA_FORMAT}', 'wb') as f:
             pickle.dump(data, f)
 
-    def _store_metadata(self, metadata: dict, dataset_id: str, file_name: str):
-        with open(self._dataset_folder(dataset_id) / f'{file_name}{self.METADATA_FORMAT}', 'w') as f:
+    def _store_metadata(self, metadata: dict, dataset_folder: Path, file_name: str):
+        with open(dataset_folder / f'{file_name}{self.METADATA_FORMAT}', 'w') as f:
             yaml.dump(metadata, f)
 
     def _create_new_dataset_folder(self):
         new_dataset_name = self._next_dataset_name()
-        new_dataset_path = self.BAND_ASSETS_PATH / new_dataset_name
+        new_dataset_path = self._DATASET_FOLDER(new_dataset_name)
         new_dataset_path.mkdir()
         return new_dataset_path
 
