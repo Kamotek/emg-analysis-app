@@ -11,8 +11,10 @@ install_python_and_pip() {
         if command_exists apt-get; then
             sudo apt-get update
             sudo apt-get install -y python3 python3-pip python3-venv
+            pip install --upgrade pip
         elif command_exists dnf; then
             sudo dnf install -y python3 python3-pip
+            pip install --upgrade pip
         fi
     elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
         # Check if Python is already installed
@@ -40,7 +42,9 @@ setup_virtualenv() {
 
 # Install pipenv
 install_pipenv() {
+    pip install --upgrade pip
     pip install pipenv
+    pip install --upgrade pipenv
 }
 
 # Create Pipfile if it doesn't exist
@@ -62,7 +66,6 @@ PySide6 = "*"
 bluepy = "*"
 numpy = "*"
 scipy = "*"
-pywt = "*"
 filterpy = "*"
 scikit-learn = "*"
 imbalanced-learn = "*"
@@ -70,7 +73,7 @@ pydrive = "*"
 matplotlib = "*"
 
 [requires]
-python_version = "3.12.3"
+python_version = "3.11"
 EOF
     else
         echo "Pipfile already exists"
@@ -80,6 +83,7 @@ EOF
 # Install dependencies
 install_dependencies() {
     PIPENV_IGNORE_VIRTUALENVS=1 pipenv install --dev
+    pipenv run
 }
 
 # Main function to coordinate setup

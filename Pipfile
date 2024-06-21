@@ -12,7 +12,6 @@ PySide6 = "*"
 bluepy = "*"
 numpy = "*"
 scipy = "*"
-pywt = "*"
 filterpy = "*"
 scikit-learn = "*"
 imbalanced-learn = "*"
@@ -20,4 +19,4 @@ pydrive = "*"
 matplotlib = "*"
 
 [requires]
-python_version = "3.12.3"
+python_version = "3.11"
