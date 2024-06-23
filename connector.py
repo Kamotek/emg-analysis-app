@@ -167,6 +167,7 @@ class Connector(QObject):
                                         self.experiment_metadata['band']['channel_mask'],
                                         self.experiment_metadata['band']['channels'],
                                         self.experiment_metadata['band']['resolution'],
+            # TODO especially because it's already done in configure_emg_raw_data()
                                         cb=set_cmd_cb,
                                         timeout=1000)
             self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_RAW"], set_cmd_cb, 1000)

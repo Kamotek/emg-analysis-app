@@ -15,16 +15,23 @@ class DataManager:
     It uses pickle and gzip for data serialization and compression, and yaml for metadata serialization.
     This way, the data can be stored in a compact and efficient way.
     """
+    DATA_DEFAULT_NAME = 'emg_raw_data'
+    METADATA_DEFAULT_NAME = 'metadata'
+
     def __init__(self):
         self.PROJECT_PATH = Path(__file__).parent.parent
         assert self.PROJECT_PATH.name == 'emg-analysis-app', 'Project path is not as expected'
 
         self.ASSETS_PATH = self.PROJECT_PATH / 'assets'
         self.BAND_ASSETS_PATH = self.ASSETS_PATH / 'band'
+
         self.DATA_FORMAT = '.pkl.gz'
         self.METADATA_FORMAT = '.yaml'
 
         self.BAND_ASSETS_PATH.mkdir(parents=True, exist_ok=True)
+
+    def list_datasets(self):
+        return [d.name for d in self.BAND_ASSETS_PATH.iterdir() if d.is_dir()]
 
     def _DATASET_FOLDER(self, dataset_id: str) -> Path:
         return self.BAND_ASSETS_PATH / dataset_id
@@ -34,7 +41,7 @@ class DataManager:
         metadata = self.load_metadata(dataset_id)
         return EMGSignal(data, metadata)
 
-    def load_data(self, dataset_id: str, file_name: str = 'emg_raw_data') -> pd.DataFrame:
+    def load_data(self, dataset_id: str, file_name: str = DATA_DEFAULT_NAME) -> pd.DataFrame:
         dataset_folder = self._DATASET_FOLDER(dataset_id)
         if not dataset_folder.exists():
             raise ValueError(f'Dataset {dataset_id} does not exist')
@@ -44,14 +51,17 @@ class DataManager:
                 return pickle.load(f)
 
     def load_metadata(self, dataset_id: str) -> dict:
-        metadata_path = self._DATASET_FOLDER(dataset_id) / f'metadata{self.METADATA_FORMAT}'
+        metadata_path = self._DATASET_FOLDER(dataset_id) / f'{self.METADATA_DEFAULT_NAME}{self.METADATA_FORMAT}'
         if not metadata_path.exists():
             raise ValueError(f'Metadata for dataset {dataset_id} does not exist')
         else:
             with open(metadata_path, 'r') as f:
                 return yaml.safe_load(f)
 
-    def store_dataset(self, data: pd.DataFrame, metadata: dict, data_name: str = 'emg_raw_data', metadata_name: str = 'metadata'):
+    def store_dataset_from_signal(self, signal: EMGSignal, data_name: str = DATA_DEFAULT_NAME, metadata_name: str = METADATA_DEFAULT_NAME):
+        self.store_dataset(signal.signal, signal.metadata, data_name, metadata_name)
+
+    def store_dataset(self, data: pd.DataFrame, metadata: dict, data_name: str = DATA_DEFAULT_NAME, metadata_name: str = METADATA_DEFAULT_NAME):
         dataset_folder = self._create_new_dataset_folder()
 
         self._store_data(data, dataset_folder, data_name)
@@ -86,3 +96,12 @@ class DataManager:
 if __name__ == '__main__':
     data_manager = DataManager()
     print(data_manager.load_dataset('24'))
+    next_dataset = data_manager._next_dataset_name()
+    data_manager.store_dataset_from_signal(data_manager.load_dataset('24'))
+    print(data_manager.load_dataset(next_dataset))
+
+    print(data_manager.list_datasets())
+
+    for dataset_id in data_manager.list_datasets():
+        metadata = data_manager.load_metadata(dataset_id)
+        print(f'Dataset {dataset_id}: {metadata}')
