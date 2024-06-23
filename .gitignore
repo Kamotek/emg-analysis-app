@@ -1,1 +1,5 @@
 /cloud_storage/drive_credentials.json
+
+# Ignore Python cache directories
+__pycache__/
+*.py[cod]
