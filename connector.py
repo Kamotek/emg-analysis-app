@@ -228,7 +228,7 @@ class Connector(QObject):
         # Replace with actual Amplified Random Forest classification logic
         return classifiers_and_tests.classifier_tree_with_feature_selection.main()
 
-    base_path = Path("preprocessed_data/")
+    base_path = Path("legacy_to_be_deleted/preprocessed_data/")
 
     def get_all_csv_files(self):
         csv_files = []
