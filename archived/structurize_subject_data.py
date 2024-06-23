@@ -6,7 +6,7 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
-from backend.DataManager import DataManager
+from backend.data_manager import DataManager
 
 GENDER_FILE_NAME = 'gender'
 FEATURES_FOLDER_NAME = 'features'

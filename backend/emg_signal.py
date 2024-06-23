@@ -2,7 +2,8 @@ import asyncio
 
 import pandas as pd
 
-from backend.Filter import Filter
+from backend.feature_extractor import FeatureExtractor
+from backend.filter import Filter
 
 
 class EMGSignal:
@@ -32,11 +33,11 @@ class EMGSignal:
     def add_data_row(self, channels_values: list):
         self._signal_queue.put_nowait(channels_values)
 
-    def _is_signal_outdated(self):
+    def _is_signal_outdated(self) -> bool:
         return not self._signal_queue.empty()
 
     @property
-    def signal(self):
+    def signal(self) -> pd.DataFrame:
         if self._is_signal_outdated:
             self._sync_signal()
         return self._signal
@@ -57,7 +58,7 @@ class EMGSignal:
             yield await self._signal_queue.get()
 
     def schedule_filter(self, emg_filter: Filter):
-        self._filters_scheduled_queue.append(filter)
+        self._filters_scheduled_queue.append(emg_filter)
 
     def apply_filters(self):
         assert self._filters_scheduled_queue, "No filters scheduled"
@@ -68,7 +69,7 @@ class EMGSignal:
             self._signal = emg_filter.filter(self._signal)
             self._filters_applied.append(emg_filter)
 
-    def schedule_feature_extraction(self, feature_extractor):
+    def schedule_feature_extraction(self, feature_extractor: FeatureExtractor):
         self._features_scheduled.append(feature_extractor)
 
     def extract_features(self):
