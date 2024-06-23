@@ -1,6 +1,6 @@
 import pandas as pd
 
-from backend.FeatureExtractor import FeatureExtractor
+from backend.feature_extractor import FeatureExtractor
 
 
 class Sample(FeatureExtractor):

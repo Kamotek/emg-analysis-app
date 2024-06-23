@@ -1,6 +1,6 @@
 import pandas as pd
 
-from backend.Filter import Filter
+from backend.filter import Filter
 
 
 class Sample(Filter):
