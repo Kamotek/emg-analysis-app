@@ -4,43 +4,58 @@ import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import classification_report
+import yaml
+import gzip
+import pickle
+from pathlib import Path
 import io
 
 def main():
-    # Names and datasets
-    names = ['Adam', 'Darina', 'Franek', 'Gabi', 'Kajtek', 'Kasia', 'Misia', 'Slawek']
-    datasets = ['dataset_1', 'dataset_2', 'dataset_3']
-    gender_labels = {'Adam': 'male', 'Darina': 'female', 'Franek': 'male', 'Gabi': 'female',
-                     'Kajtek': 'male', 'Kasia': 'female', 'Misia': 'female', 'Slawek': 'male'}
+    base_dir = Path("assets/band")  # Directory to search
 
-    all_wavelet_data = []
+    all_emg_data = []
     all_labels = []
 
-    def read_wavelet_transform_data(folder, label):
-        wavelet_file_path = os.path.join(folder, 'Wavelet Transform.csv')
-        frequencies_file_path = os.path.join(folder, 'Wavelet Transform_frequencies.csv')
-        wavelet_data = pd.read_csv(wavelet_file_path, header=None, on_bad_lines='skip').values.flatten()
-        frequencies_data = pd.read_csv(frequencies_file_path, header=None, on_bad_lines='skip').values.flatten()
-        combined_data = np.concatenate((wavelet_data, frequencies_data), axis=0)  # Combine data
-        return combined_data, label
+    max_length = 0
+    data_store = []
 
-    base_dir = os.path.dirname(__file__)  # Get base directory for relative paths
+    # Function to read EMG data from a pkl.gz file
+    def read_emg_data(emg_data_file):
+        with gzip.open(emg_data_file, 'rb') as f:
+            emg_data = pickle.load(f)
+        return np.array(emg_data).flatten()  # Flatten to a 1D array
 
-    for name in names:
-        for dataset in datasets:
-            data_folder = os.path.join(base_dir, f'../preprocessed_data/{name}/{dataset}/features')
-            try:
-                combined_data, label = read_wavelet_transform_data(data_folder, gender_labels[name])
-                all_wavelet_data.append(combined_data)
-                all_labels.append(label)
-            except Exception as e:
-                print(f"Skipping {name}-{dataset} due to error: {e}")
-                continue
+    # Function to get gender from metadata.yaml file
+    def get_gender_from_metadata(metadata_file):
+        with metadata_file.open() as f:
+            metadata = yaml.safe_load(f)
+        gender = metadata.get('subject', {}).get('gender', 'unknown').lower()
+        return 'male' if gender == 'm' else 'female' if gender == 'f' else 'unknown'
 
-    max_length = max(len(data) for data in all_wavelet_data)
-    padded_combined_data = [np.pad(data, (0, max_length - len(data)), 'constant') for data in all_wavelet_data]
+    # Search for files in the directory
+    for subdir in base_dir.rglob('*'):
+        if subdir.is_dir():
+            emg_data_file = subdir / 'kalman_filtered_emg_data.pkl.gz'
+            metadata_file = subdir / 'metadata.yaml'
+            if emg_data_file.exists() and metadata_file.exists():
+                try:
+                    emg_data = read_emg_data(emg_data_file)
+                    gender = get_gender_from_metadata(metadata_file)
+                    if gender != 'unknown':
+                        data_store.append((emg_data, gender))
+                        if len(emg_data) > max_length:
+                            max_length = len(emg_data)
+                except Exception as e:
+                    print(f"Skipping {emg_data_file} due to error: {e}")
+                    continue
 
-    X = np.array(padded_combined_data)
+    # Pad data to ensure consistent length
+    for emg_data, label in data_store:
+        padded_data = np.pad(emg_data, (0, max_length - len(emg_data)), 'constant')
+        all_emg_data.append(padded_data)
+        all_labels.append(label)
+
+    X = np.array(all_emg_data)
     y = np.array(all_labels)
 
     output = io.StringIO()
@@ -66,6 +81,7 @@ def main():
     result = output.getvalue()
     output.close()
 
+    print(result)
     return result
 
 if __name__ == "__main__":

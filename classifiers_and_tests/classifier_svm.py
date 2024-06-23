@@ -1,4 +1,3 @@
-
 import io
 import os
 import numpy as np
@@ -6,52 +5,51 @@ import pandas as pd
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import classification_report
-
+import yaml
+import gzip
+import pickle
+from pathlib import Path
 
 def main():
-        
-    # Define the names and datasets
-    names = ['Adam', 'Darina', 'Franek', 'Gabi', 'Kajtek', 'Kasia', 'Misia', 'Slawek']
-    datasets = ['dataset_1', 'dataset_2', 'dataset_3']
-    gender_labels = {'Adam': 'male', 'Darina': 'female', 'Franek': 'male', 'Gabi': 'female', 'Kajtek': 'male', 'Kasia': 'female', 'Misia': 'female', 'Slawek': 'male'}
+    # Define base directory
+    base_dir = Path("assets/band")
 
-    # Initialize empty lists to store all wavelet transform data and labels
-    all_wavelet_data = []
+    # Initialize empty lists to store all EMG data and labels
+    all_emg_data = []
     all_labels = []
 
-    # Function to read wavelet transform data and frequencies from a given path
-    def read_wavelet_transform_data(folder, label):
-        wavelet_file_path = os.path.join(folder, 'Wavelet Transform.csv')
-        frequencies_file_path = os.path.join(folder, 'Wavelet Transform_frequencies.csv')
-        wavelet_data = pd.read_csv(wavelet_file_path, header=None, on_bad_lines='skip').values.flatten()
-        frequencies_data = pd.read_csv(frequencies_file_path, header=None, on_bad_lines='skip').values.flatten()
-        combined_data = np.concatenate((wavelet_data, frequencies_data), axis=0)  # Combine wavelet and frequencies data
+    max_length = 0
+    data_store = []
 
-            
-        additional_data_files = ['Mean Absolute Value.csv', 'Mean Frequency.csv', 'Median Frequency.csv', 'Root Mean Square.csv']
-        for file_name in additional_data_files:
-            file_path = os.path.join(folder, file_name)
-            additional_data = pd.read_csv(file_path, header=None, on_bad_lines='skip').values.flatten()
-            combined_data = np.concatenate((combined_data, additional_data), axis=0)
-            
-        return combined_data, label
+    # Iterate over all subdirectories in base_dir
+    for subdir in base_dir.rglob('*'):
+        if subdir.is_dir():
+            # Look for the kalman_filtered_emg_data.pkl.gz file
+            emg_data_file = subdir / 'kalman_filtered_emg_data.pkl.gz'
+            metadata_file = subdir / 'metadata.yaml'
+            if emg_data_file.exists() and metadata_file.exists():
+                try:
+                    # Read and process EMG data
+                    emg_data = read_emg_data(emg_data_file)
+                    
+                    # Read gender from metadata
+                    gender = get_gender_from_metadata(metadata_file)
+                    
+                    # Store data and gender
+                    data_store.append((emg_data, gender))
+                    if len(emg_data) > max_length:
+                        max_length = len(emg_data)
+                except Exception as e:
+                    print(f"Skipping {emg_data_file} due to error: {e}")
+                    continue
 
-    # Read data for individual names and datasets
-    for name in names:
-        for dataset in datasets:
-            data_folder = get_data_folder(name, dataset)
-            combined_data, label = read_wavelet_transform_data(data_folder, gender_labels[name])
-            all_wavelet_data.append(combined_data)
-            all_labels.append(label)
+    # Pad data to ensure all arrays are of the same length
+    for emg_data, label in data_store:
+        padded_data = np.pad(emg_data, (0, max_length - len(emg_data)), 'constant')
+        all_emg_data.append(padded_data)
+        all_labels.append(label)
 
-    # Find the maximum length of combined data arrays
-    max_length = max(len(data) for data in all_wavelet_data)
-
-    # Pad combined data arrays to have the same length
-    padded_combined_data = [np.pad(data, (0, max_length - len(data)), 'constant') for data in all_wavelet_data]
-
-    # Convert lists to numpy arrays
-    X = np.array(padded_combined_data)
+    X = np.array(all_emg_data)
     y = np.array(all_labels)
 
     # Split the data into training and testing sets
@@ -63,6 +61,7 @@ def main():
 
     # Predict on the test set
     y_pred = svm_clf.predict(X_test)
+
     # Redirect print output to a string
     output = io.StringIO()
 
@@ -79,29 +78,22 @@ def main():
     result = output.getvalue()
     output.close()
 
+    print(result)
     return result
 
 
-def get_data_folder(name, dataset):
-    # Get the current script's directory
-    base_dir = os.path.dirname(__file__)
-    
-    # Construct the relative path
-    relative_path = os.path.join(
-        base_dir,
-        '..',  # Move up one directory
-        'preprocessed_data',
-        name,
-        f'{dataset}',
-        'features'  # Adjust the dataset part as requested
-    )
+def read_emg_data(emg_data_file):
+    """Reads and returns the EMG data from a pkl.gz file."""
+    with gzip.open(emg_data_file, 'rb') as f:
+        emg_data = pickle.load(f)
+    return np.array(emg_data).flatten()  # Assuming EMG data is list-like and needs to be flattened
 
-    # Normalize the path to remove any redundant separators
-    data_folder = os.path.normpath(relative_path)
-    
-    return data_folder
-
-
+def get_gender_from_metadata(metadata_file):
+    """Retrieve the gender from the metadata.yaml file."""
+    with metadata_file.open() as f:
+        metadata = yaml.safe_load(f)
+    gender = metadata.get('subject', {}).get('gender', 'Unknown').lower()
+    return 'male' if gender == 'm' else 'female' if gender == 'f' else 'unknown'
 
 if __name__ == '__main__':
     main()

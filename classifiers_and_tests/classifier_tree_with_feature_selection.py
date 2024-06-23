@@ -8,52 +8,46 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import make_pipeline
 from sklearn.feature_selection import SelectKBest, f_classif
 from imblearn.over_sampling import SMOTE
+import yaml
+import gzip
+import pickle
 import io
+from pathlib import Path
 
 def main():
-    # Define the participant names and their corresponding datasets
-    names = ['Adam', 'Darina', 'Franek', 'Gabi', 'Kajtek', 'Kasia', 'Misia', 'Slawek']
-    datasets = ['dataset_1', 'dataset_2', 'dataset_3']
-    gender_labels = {'Adam': 'male', 'Darina': 'female', 'Franek': 'male', 'Gabi': 'female', 
-                     'Kajtek': 'male', 'Kasia': 'female', 'Misia': 'female', 'Slawek': 'male'}
-
-
+    base_dir = Path("assets/band")
 
     all_wavelet_data = []
     all_labels = []
 
-    # Function to read wavelet transform data from a given path
-    def read_wavelet_transform_data(folder):
-        wavelet_file_path = os.path.join(folder, 'Wavelet Transform.csv')
-        wavelet_data = pd.read_csv(wavelet_file_path, header=None, on_bad_lines='skip').values.flatten()
-        return wavelet_data
-
-    # Function to read wavelet transform frequency data from a given path
-    def read_wavelet_transform_freq_data(folder):
-        wavelet_freq_file_path = os.path.join(folder, 'Wavelet Transform_frequencies.csv')
-        wavelet_freq_data = pd.read_csv(wavelet_freq_file_path, header=None, on_bad_lines='skip').values.flatten()
-        return wavelet_freq_data
-
     max_length = 0
     data_store = []
 
-    for name in names:
-        for dataset in datasets:
-            data_folder = get_data_folder(name, dataset)
-            try:
-                wavelet_data = read_wavelet_transform_data(data_folder)
-                wavelet_freq_data = read_wavelet_transform_freq_data(data_folder)
-                combined_data = np.concatenate((wavelet_data, wavelet_freq_data))
-                data_store.append((combined_data, gender_labels[name]))
-                if len(combined_data) > max_length:
-                    max_length = len(combined_data)
-            except Exception as e:
-                print(f"Skipping {name}-{dataset} due to error: {e}")
-                continue
+    # Iterate over all subdirectories in base_dir
+    for subdir in base_dir.rglob('*'):
+        if subdir.is_dir():
+            # Look for the kalman_filtered_emg_data.pkl.gz file
+            emg_data_file = subdir / 'kalman_filtered_emg_data.pkl.gz'
+            metadata_file = subdir / 'metadata.yaml'
+            if emg_data_file.exists() and metadata_file.exists():
+                try:
+                    # Read and process EMG data
+                    emg_data = read_emg_data(emg_data_file)
+                    
+                    # Read gender from metadata
+                    gender = get_gender_from_metadata(metadata_file)
+                    
+                    # Store data and gender
+                    data_store.append((emg_data, gender))
+                    if len(emg_data) > max_length:
+                        max_length = len(emg_data)
+                except Exception as e:
+                    print(f"Skipping {emg_data_file} due to error: {e}")
+                    continue
 
-
-    for combined_data, label in data_store:
-        padded_data = np.pad(combined_data, (0, max_length - len(combined_data)), 'constant')
+    # Pad data to ensure all arrays are of the same length
+    for emg_data, label in data_store:
+        padded_data = np.pad(emg_data, (0, max_length - len(emg_data)), 'constant')
         all_wavelet_data.append(padded_data)
         all_labels.append(label)
 
@@ -103,18 +97,18 @@ def main():
 
     return result
 
-def get_data_folder(name, dataset):
-    base_dir = os.path.dirname(__file__)
-    relative_path = os.path.join(
-        base_dir,
-        '..',
-        'preprocessed_data',
-        name,
-        f'{dataset}',
-        'features'
-    )
-    data_folder = os.path.normpath(relative_path)
-    return data_folder
+def read_emg_data(emg_data_file):
+    """Reads and returns the EMG data from a pkl.gz file."""
+    with gzip.open(emg_data_file, 'rb') as f:
+        emg_data = pickle.load(f)
+    return np.array(emg_data).flatten()  # Assuming EMG data is list-like and needs to be flattened
+
+def get_gender_from_metadata(metadata_file):
+    """Retrieve the gender from the Metadata.yaml file."""
+    with metadata_file.open() as f:
+        metadata = yaml.safe_load(f)
+    gender = metadata.get('subject', {}).get('gender', 'Unknown').lower()
+    return 'male' if gender == 'm' else 'female' if gender == 'f' else 'unknown'
 
 if __name__ == "__main__":
     result = main()
