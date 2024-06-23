@@ -10,7 +10,7 @@ def main(file_path):
     # Path to the dataset file
     dataset_file = file_path
     # Read the dataset into a pandas DataFrame without a header
-    df = pd.read_csv(dataset_file, header=None)
+    df = pd.read_pickle(dataset_file, compression='gzip')
 
     # Assuming the EMG data starts from the first column and goes onward
     # Rename the columns to reflect EMG channels (e.g., 'emg1', 'emg2', etc.)

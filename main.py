@@ -150,20 +150,23 @@ class MainWindow(QMainWindow):
         item = QListWidgetItem(f"EMG Data: {emg_data}")
         self.ui.data_read.addItem(item)
 
+
     def load_files(self):
-        csv_files = self.connector.get_all_csv_files()
+        files_with_genders = self.connector.get_all_csv_files()
         self.ui.data_list.clear()  # Clear the list before adding new items
-        for file_path in csv_files:
-            item = QListWidgetItem(str(file_path))
+        
+        for file_path, gender in files_with_genders:
+            item_text = f"{file_path} -- {gender}"
+            item = QListWidgetItem(item_text)
             self.ui.data_list.addItem(item)
-            
+
     def draw_chart(self):
         selected_items = self.ui.data_list.selectedItems()
         if not selected_items:
             QMessageBox.warning(self, "Draw Chart", "No file selected.")
             return
 
-        selected_file = selected_items[0].text()
+        selected_file = selected_items[0].text().split('--')[0].strip()
         fig = self.connector.visualize_file(selected_file)
 
         if fig is None:
