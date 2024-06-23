@@ -5,6 +5,8 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
+from backend.emg_signal import EMGSignal
+
 
 class DataManager:
     """
@@ -27,6 +29,11 @@ class DataManager:
     def _DATASET_FOLDER(self, dataset_id: str) -> Path:
         return self.BAND_ASSETS_PATH / dataset_id
 
+    def load_dataset(self, dataset_id: str) -> EMGSignal:
+        data = self.load_data(dataset_id)
+        metadata = self.load_metadata(dataset_id)
+        return EMGSignal(data, metadata)
+
     def load_data(self, dataset_id: str, file_name: str = 'emg_raw_data') -> pd.DataFrame:
         dataset_folder = self._DATASET_FOLDER(dataset_id)
         if not dataset_folder.exists():
@@ -37,7 +44,7 @@ class DataManager:
                 return pickle.load(f)
 
     def load_metadata(self, dataset_id: str) -> dict:
-        metadata_path = self._DATASET_FOLDER(dataset_id) / 'metadata.yaml'
+        metadata_path = self._DATASET_FOLDER(dataset_id) / f'metadata{self.METADATA_FORMAT}'
         if not metadata_path.exists():
             raise ValueError(f'Metadata for dataset {dataset_id} does not exist')
         else:
@@ -78,5 +85,4 @@ class DataManager:
 
 if __name__ == '__main__':
     data_manager = DataManager()
-    print(data_manager.load_data('1'))
-    print(data_manager.load_metadata('1'))
+    print(data_manager.load_dataset('24'))

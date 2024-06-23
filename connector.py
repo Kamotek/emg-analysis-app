@@ -11,7 +11,7 @@ import classifiers_and_tests.classifier_svm
 import classifiers_and_tests.classifier_tree
 import classifiers_and_tests.classifier_tree_with_feature_selection
 from backend.data_manager import DataManager
-from backend.emg_signal import EMGSignal
+from backend.emg_signal import EMGSignal, build_metadata
 from band_interface.gforce import DataNotifFlags, GForceProfile, NotifDataType
 from visualizers import draw
 
@@ -67,7 +67,6 @@ def ondata(data, connector):
                 start_time = time.time()
 
             emg_data = list(data[1:129])
-            #emg_writer.writerow(emg_data)
 
             connector.emg_signal.add_data_row(emg_data)
 
@@ -93,14 +92,8 @@ class Connector(QObject):
     def __init__(self):
         super().__init__()
         self.GF = GForceProfile()
-        self.sampRate = None
-        self.channelMask = None
-        self.dataLen = None
-        self.resolution = None
-        self.age = None
-        self.gender = None
-        self.height = None
-        self.weight = None
+
+        self.experiment_metadata = None
 
         self.data_manager = DataManager()
         self.emg_signal = None
@@ -150,39 +143,15 @@ class Connector(QObject):
         self.GF.setDataNotifSwitch(DataNotifFlags["DNF_OFF"], set_cmd_cb, 1000)
 
         data = self.emg_signal.signal
-        metadata = self.metadata_from_band_config()
+        metadata = self.emg_signal.metadata
         self.data_manager.store_dataset(data, metadata)
         self.emg_signal = None  # Free the memory
 
-
     def configure_emg_raw_data(self, sampRate, channelMask, dataLen, resolution, age, gender, height, weight):
-        self.sampRate = sampRate
-        self.channelMask = channelMask
-        self.dataLen = dataLen
-        self.resolution = resolution
-        #---
-        self.age = age
-        self.gender = gender
-        self.height = height
-        self.weight = weight
+        self.experiment_metadata = build_metadata(sampling_rate=sampRate, channel_mask=channelMask, channels=dataLen,
+                                                  resolution=resolution, age=age, gender=gender, height=height, weight=weight)
 
         self.GF.setEmgRawDataConfig(sampRate, channelMask, dataLen, resolution, cb=set_cmd_cb, timeout=1000)
-
-    def metadata_from_band_config(self):
-        return {
-            'band': {
-                'sampRate': self.sampRate,
-                'channelMask': self.channelMask,
-                'dataLen': self.dataLen,
-                'resolution': self.resolution
-            },
-            'subject': {
-                "age": self.age,
-                "gender": self.gender,
-                "height": self.height,
-                "weight": self.weight
-            }
-        }
 
     def start_gesture_notifications(self, gesture_type):
         if gesture_type == 0:
@@ -192,12 +161,17 @@ class Connector(QObject):
         self.GF.startDataNotification(lambda data: ondata(data, self))
 
     def start_emg_notifications(self):
-        if self.sampRate is not None and self.channelMask is not None and self.dataLen is not None and self.resolution is not None:
-            self.GF.setEmgRawDataConfig(self.sampRate, self.channelMask, self.dataLen, self.resolution, cb=set_cmd_cb,
+        if self.experiment_metadata is not None:
+            # TODO please @Kamil examine if this line below is needed. Especially when executing EMG Start a few times in a row.
+            self.GF.setEmgRawDataConfig(self.experiment_metadata['band']['sampling_rate'],
+                                        self.experiment_metadata['band']['channel_mask'],
+                                        self.experiment_metadata['band']['channels'],
+                                        self.experiment_metadata['band']['resolution'],
+                                        cb=set_cmd_cb,
                                         timeout=1000)
             self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_RAW"], set_cmd_cb, 1000)
 
-            self.emg_signal = EMGSignal(channels=self.dataLen, sample_rate=self.sampRate)
+            self.emg_signal = EMGSignal(metadata=self.experiment_metadata)
 
             self.GF.startDataNotification(lambda data: ondata(data, self))
         else:

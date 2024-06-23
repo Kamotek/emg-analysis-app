@@ -17,12 +17,11 @@ class EMGSignal:
     The signal is a time series of EMG data, where each row represents a moment in time
     and each column represents the signal value for a specific channel.
     """
-    def __init__(self, channels, sample_rate):
-        self.channels = channels
-        self.sample_rate = sample_rate
-
-        self._signal = pd.DataFrame(columns=range(channels))
+    def __init__(self, data: pd.DataFrame = None, metadata: dict = None):
+        self._signal = data if data is not None else pd.DataFrame()
         self._signal_queue = asyncio.Queue()
+
+        self._metadata = metadata if metadata is not None else {}
 
         self._filters_scheduled_queue = []
         self._features_scheduled = []
@@ -33,20 +32,24 @@ class EMGSignal:
     def add_data_row(self, channels_values: list):
         self._signal_queue.put_nowait(channels_values)
 
-    def _is_signal_outdated(self) -> bool:
-        return not self._signal_queue.empty()
-
     @property
     def signal(self) -> pd.DataFrame:
         if self._is_signal_outdated:
             self._sync_signal()
         return self._signal
 
+    def _is_signal_outdated(self) -> bool:
+        return not self._signal_queue.empty()
+
     def _sync_signal(self):
         signal_latest_rows = []
         while not self._signal_queue.empty():
             signal_latest_rows.append(self._signal_queue.get_nowait())
         self._signal = pd.concat([self._signal, pd.DataFrame(signal_latest_rows)])
+
+    @property
+    def metadata(self) -> dict:
+        return self._metadata
 
     async def stream(self):
         # TODO: streaming should be done with asyncio, nice framework for dealing with IO-bound tasks
@@ -79,19 +82,36 @@ class EMGSignal:
             feature_dataframe = feature_extractor.extract(self._signal)
             self._features_extracted[feature_extractor] = feature_dataframe
 
+    def __str__(self):
+        return f'{__class__.__name__}(data=\n{self.signal}, \nmetadata={self.metadata})'
+
 
 async def main():
     channels = 128
     sample_rate = 500
 
     data = [i + 0.1 for i in range(channels)]
-    signal = EMGSignal(channels, sample_rate)
+    signal = EMGSignal(metadata={'sample_rate': sample_rate, 'channels': channels})
 
     for _ in range(10):
         signal.add_data_row(data)
 
-    print(signal.signal)
+    print(signal)
     # note - here I don't really test the asyncio cause I don't even know how yet
 
 if __name__ == '__main__':
     asyncio.run(main())
+
+
+def build_metadata(sampling_rate, channel_mask, channels, resolution, age, gender, height, weight):
+    """ A centralized way of enforcing dict keys for the EMG metadata representation.
+        Not the best for sure, but best what came to my mind now, better than defining the dict in some wild place of code.
+
+        The alternative would probably be making a separate class for it.
+    """
+    return {
+        'band':
+            {'sampling_rate': sampling_rate, 'channel_mask': channel_mask, 'channels': channels, 'resolution': resolution},
+        'subject':
+            {'age': age, 'gender': gender, 'height': height, 'weight': weight}
+    }
