@@ -14,6 +14,7 @@ import classifiers_and_tests.classifier_tree_with_feature_selection
 from backend.data_manager import DataManager
 from backend.emg_signal import EMGSignal, build_metadata
 from band_interface.gforce import DataNotifFlags, GForceProfile, NotifDataType
+from cloud_storage.drive_manager import GoogleDriveManager
 from visualizers import draw
 
 # Global file handlers and CSV writers for data logging
@@ -99,6 +100,8 @@ class Connector(QObject):
         self.data_manager = DataManager()
         self.emg_signal = None
 
+        self.drive_manager = None  # initialize on demand
+
     def scan_devices(self):
         print("Scanning devices...")
         scan_results = self.GF.scan(5)
@@ -168,6 +171,7 @@ class Connector(QObject):
                                         self.experiment_metadata['band']['channel_mask'],
                                         self.experiment_metadata['band']['channels'],
                                         self.experiment_metadata['band']['resolution'],
+            # TODO especially because it's already done in configure_emg_raw_data()
                                         cb=set_cmd_cb,
                                         timeout=1000)
             self.GF.setDataNotifSwitch(DataNotifFlags["DNF_EMG_RAW"], set_cmd_cb, 1000)
@@ -222,8 +226,30 @@ class Connector(QObject):
         for file in base_path.rglob("*.gz"):  # More efficient to filter directly in rglob
             gender = self.get_gender_from_metadata(file)
             files_and_genders.append((file, gender))
+    return files_and_genders
 
-        return files_and_genders
+    def get_local_datasets_IDs(self):
+        return self.data_manager.list_datasets()
+
+    def get_local_dataset_description(self, dataset_id):
+        metadata = self.data_manager.load_metadata(dataset_id)
+        description = f'[{dataset_id}] {metadata}'
+
+        return description
+
+    def ensure_drive_login(self):
+        if self.drive_manager is None:
+            self.drive_manager = GoogleDriveManager()
+
+    def get_external_datasets_IDs(self):
+        return self.drive_manager.list_datasets()
+
+    def get_external_dataset_description(self, dataset_id):
+        metadata = 'unknown'
+        description = f'[{dataset_id}] {metadata}'
+
+        return description
+
     def visualize_file(self, file_path):
         try:
             # Assuming draw_chart is defined in visualisations.draw module

@@ -42,7 +42,14 @@ class MainWindow(QMainWindow):
         # Connect UI buttons to methods (unchanged from your original code)
         self.ui.Btn_Toggle.clicked.connect(lambda: self.toggle_menu())
         self.ui.btn_page_1.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.page_1))
+
         self.ui.btn_page_2.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.page_2))
+        self.ui.btn_page_2.clicked.connect(self.load_local_files)
+        self.ui.btn_page_2.clicked.connect(self.connector.ensure_drive_login)
+
+        self.ui.btn_page_2.clicked.connect(self.load_external_files)
+        # TODO works, but it is synchronous, so it blocks the UI (tab load lag). Either leave it or make it async (chatgpt)
+
         self.ui.btn_page_3.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.page_3))
         self.ui.btn_page_4.clicked.connect(lambda: self.ui.stackedWidget.setCurrentWidget(self.ui.page_4))
 
@@ -159,6 +166,24 @@ class MainWindow(QMainWindow):
             item_text = f"{file_path} -- {gender}"
             item = QListWidgetItem(item_text)
             self.ui.data_list.addItem(item)
+
+    def load_local_files(self):
+        local_datasets_IDs = self.connector.get_local_datasets_IDs()
+        self.ui.list_local_files.clear()
+        for dataset_id in local_datasets_IDs:
+            description = self.connector.get_local_dataset_description(dataset_id)
+            item = QListWidgetItem(description)
+            self.ui.list_local_files.addItem(item)
+
+    def load_external_files(self):
+        external_datasets_IDs = self.connector.get_external_datasets_IDs()
+        self.ui.list_external_files.clear()
+        for dataset_id in external_datasets_IDs:
+            description = self.connector.get_external_dataset_description(dataset_id)
+            item = QListWidgetItem(description)
+            self.ui.list_external_files.addItem(item)
+
+
 
     def draw_chart(self):
         selected_items = self.ui.data_list.selectedItems()

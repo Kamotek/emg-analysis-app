@@ -1,4 +1,4 @@
-from GoogleDriveManager import GoogleDriveManager
+from drive_manager import GoogleDriveManager
 
 
 def main():
