@@ -9,25 +9,37 @@ from band_interface.ui_functions import UIFunctions
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 
 
-# class ChartArea(QWidget):
-#     def __init__(self, parent=None):
-#         super().__init__(parent)
-#         self.layout = QVBoxLayout(self)
-#         self.setLayout(self.layout)
-#         self.canvas = None  # Initialize canvas attribute
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from PySide6.QtWidgets import QVBoxLayout, QWidget
 
-#     def set_chart(self, fig):
-#         # Clear the layout first
-#         while self.layout.count() > 0:
-#             item = self.layout.takeAt(0)
-#             widget = item.widget()
-#             if widget:
-#                 widget.deleteLater()
+class ChartArea(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.layout = QVBoxLayout(self)
+        self.setLayout(self.layout)
+        self.canvas = None
 
-#         # Create a new FigureCanvas and add it to the layout
-#         self.canvas = FigureCanvas(fig)
-#         self.layout.addWidget(self.canvas)
-#         self.canvas.draw()  # Explicitly draw the canvas
+        # Set minimum size for the chart area
+        self.setMinimumSize(1200, 600)
+
+    def set_chart(self, fig):
+        # Clear the layout first
+        while self.layout.count() > 0:
+            item = self.layout.takeAt(0)
+            widget = item.widget()
+            if widget:
+                widget.deleteLater()
+
+        # Create a new FigureCanvas and add it to the layout
+        self.canvas = FigureCanvas(fig)
+        self.layout.addWidget(self.canvas)
+        self.canvas.draw()  # Explicitly draw the canvas
+
+        self.update()  # Force update of the widget
+        self.repaint()  # Force repaint of the widget
 
 
 class MainWindow(QMainWindow):
@@ -37,7 +49,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
 
         self.connector = Connector()
-        #self.chart_area = ChartArea(self.ui.chart_area)  # Assuming ui.chart_area is a placeholder QWidget
+        self.chart_area = ChartArea(self.ui.chart_area)  # Assuming ui.chart_area is a placeholder QWidget
 
         # Connect UI buttons to methods (unchanged from your original code)
         self.ui.Btn_Toggle.clicked.connect(lambda: self.toggle_menu())
@@ -184,7 +196,6 @@ class MainWindow(QMainWindow):
             self.ui.list_external_files.addItem(item)
 
 
-
     def draw_chart(self):
         selected_items = self.ui.data_list.selectedItems()
         if not selected_items:
@@ -198,13 +209,14 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Draw Chart", "Failed to generate chart.")
             return
 
-        fig.show()
-        # # Set the chart on the existing chart_area instance
-        # self.chart_area.set_chart(fig)
-        
-        # # Show the chart area widget
-        # self.chart_area.show()
+        print("Figure received: ", fig)  # Debugging print
+        print("Chart area geometry:", self.chart_area.geometry())
+        print("Chart area size:", self.chart_area.size())
 
+        # Set the chart on the existing chart_area instance
+        self.chart_area.set_chart(fig)
+        self.chart_area.update()  # Force the chart area to update
+        self.chart_area.repaint()  # Force repainting of the chart area
 
     def classify_data(self, method):
         data = self.connector.fetch_data()

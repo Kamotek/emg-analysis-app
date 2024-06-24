@@ -14,7 +14,7 @@ from PySide6 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1084, 662)
+        MainWindow.resize(1920, 1080)
         MainWindow.setMinimumSize(QtCore.QSize(1000, 500))
         MainWindow.setStyleSheet("background-color: rgb(45, 45, 45);")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
@@ -387,7 +387,7 @@ class Ui_MainWindow(object):
         self.data_list.setObjectName("data_list")
         self.verticalLayout_91.addWidget(self.data_list)
         self.chart_area = QtWidgets.QWidget(self.page_4)
-        self.chart_area.setMinimumSize(QtCore.QSize(0, 200))
+        self.chart_area.setMinimumSize(QtCore.QSize(1200, 600))
         self.chart_area.setStyleSheet("background-color: #232323;\n"
 "        border: 1px solid #55AADD;")
         self.chart_area.setObjectName("chart_area")
