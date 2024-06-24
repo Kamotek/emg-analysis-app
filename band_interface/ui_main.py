@@ -398,6 +398,13 @@ class Ui_MainWindow(object):
         self.verticalLayout.addWidget(self.Content)
         MainWindow.setCentralWidget(self.centralwidget)
 
+        self.lbl_external_files.setStyleSheet("color: white;")
+        self.lbl_local_files.setStyleSheet("color: white;")
+        self.list_external_files.setStyleSheet("color: white;")
+        self.list_local_files.setStyleSheet("color: white;")
+        self.label_2.setStyleSheet("color: white;")
+        self.label_3.setStyleSheet("color: white;")
+
         self.retranslateUi(MainWindow)
         self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
