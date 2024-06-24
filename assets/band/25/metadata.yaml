@@ -1,0 +1,10 @@
+band:
+  channel_mask: 255
+  channels: 128
+  resolution: 8
+  sampling_rate: 500
+subject:
+  age: 2137
+  gender: Male
+  height: 175
+  weight: 70

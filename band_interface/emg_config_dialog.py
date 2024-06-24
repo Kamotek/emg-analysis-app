@@ -106,27 +106,27 @@ class EMGConfigDialog(QDialog):
         ]):
             raise ValueError("All fields are required")
         
-        age_input = age_input.text()
-        height_input = height_input.text()
-        weight_input = weight_input.text()
-        gender_combobox = gender_combobox.currentText()
+        self.age_input_var = self.age_input.text()
+        self.height_input_var = self.height_input.text()
+        self.weight_input_var = self.weight_input.text()
+        self.gender_combobox_var = self.gender_combobox.currentText()
         
         if self.age_input.text() is None:
-            age_input = -1
+            age_input_var = -1
         if self.height_input.text() is None:
-            height_input = -1
+            height_input_var = -1
         if self.weight_input.text() is None:
-            weight_input = -1
+            weight_input_var = -1
         if self.gender_combobox.currentText is None or self.gender_combobox.currentText == "Other":
-            gender_combobox = "Unknown"
+            gender_combobox_var = "Unknown"
 
         return {
             'sample_rate': int(self.sample_rate_input.text()),
             'channel_mask': int(self.channel_mask_input.text(), 16),  # Assuming hex input
             'data_length': int(self.data_length_input.text()),
             'resolution': int(self.resolution_input.text()),
-            'gender': str(gender_combobox),
-            'age': int(age_input),
-            'height': int(height_input),
-            'weight': int(weight_input),
+            'gender': str(self.gender_combobox_var),
+            'age': int(self.age_input_var),
+            'height': int(self.height_input_var),
+            'weight': int(self.weight_input_var),
         }
