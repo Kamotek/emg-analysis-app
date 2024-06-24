@@ -1,15 +1,18 @@
-import os
+from pathlib import Path
 
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
 
 class GoogleDriveManager:
-    def __init__(self, settings_file='drive_settings.yaml', app_folder_name='EMG Analysis Data'):
+    def __init__(self, settings_file=Path(__file__).parent / 'drive_settings.yaml', app_folder_name='EMG Analysis Data'):
         self.settings_file = settings_file
         self.app_folder_name = app_folder_name
+        self.client_secrets_file = Path(__file__).parent / 'client_secrets.json'
 
         self.gauth = GoogleAuth(settings_file=self.settings_file)
+        self.gauth.LoadClientConfigFile(self.client_secrets_file)
+
         self.authenticate_persistently()
         self.drive = GoogleDrive(self.gauth)
 
@@ -17,9 +20,9 @@ class GoogleDriveManager:
 
     def authenticate_persistently(self):
         """ Login to Google Drive and save the credentials securely to a file."""
-        credentials_path = self.gauth.settings.get('save_credentials_file')
+        credentials_path = Path(self.gauth.settings.get('save_credentials_file'))
 
-        if os.path.exists(credentials_path):
+        if credentials_path.exists():
             self.gauth.LoadCredentialsFile(credentials_path)
 
         if self.gauth.credentials is None:
@@ -112,3 +115,6 @@ class GoogleDriveManager:
         assert file, f'File {drive_filename} not found in folder'
 
         file.GetContentFile(local_path)
+
+    def list_datasets(self):
+        return [d['title'] for d in self.drive.ListFile({'q': f"'{self.app_folder_id}' in parents and trashed=false"}).GetList()]

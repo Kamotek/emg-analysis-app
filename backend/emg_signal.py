@@ -110,8 +110,9 @@ def build_metadata(sampling_rate, channel_mask, channels, resolution, age, gende
         The alternative would probably be making a separate class for it.
     """
     return {
-        'band':
-            {'sampling_rate': sampling_rate, 'channel_mask': channel_mask, 'channels': channels, 'resolution': resolution},
         'subject':
-            {'age': age, 'gender': gender, 'height': height, 'weight': weight}
+            {'age': age, 'gender': gender, 'height': height, 'weight': weight},
+        'band':
+            {'sampling_rate': sampling_rate, 'channel_mask': channel_mask, 'channels': channels,
+             'resolution': resolution}
     }
