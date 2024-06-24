@@ -109,6 +109,22 @@ def build_metadata(sampling_rate, channel_mask, channels, resolution, age, gende
 
         The alternative would probably be making a separate class for it.
     """
+    if not isinstance(sampling_rate, int):
+        raise TypeError("sampling_rate must be an integer")
+    if not isinstance(channel_mask, int):
+        raise TypeError("channel_mask must be an integer")
+    if not isinstance(channels, int):
+        raise TypeError("channels must be an integer")
+    if not isinstance(resolution, int):
+        raise TypeError("resolution must be an integer")
+    if not isinstance(age, int):
+        raise TypeError("age must be an integer")
+    if not isinstance(gender, str):
+        raise TypeError("gender must be a string")
+    if not isinstance(height, int):
+        raise TypeError("height must be an integer")
+    if not isinstance(weight, int):
+        raise TypeError("weight must be an integer")
     return {
         'subject':
             {'age': age, 'gender': gender, 'height': height, 'weight': weight},

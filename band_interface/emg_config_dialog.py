@@ -53,6 +53,7 @@ class EMGConfigDialog(QDialog):
         self.gender_label = QLabel("Gender:")
         self.gender_combobox = QComboBox()
         self.gender_combobox.addItems(["Male", "Female", "Other"])
+        self.gender_combobox.setCurrentIndex(0)  # Default
         self.gender_label.setStyleSheet("color: white;")  # Set white font color
         self.gender_combobox.setStyleSheet("color: white;")  # Set white font color
         layout.addWidget(self.gender_label)
@@ -62,6 +63,7 @@ class EMGConfigDialog(QDialog):
         self.age_label = QLabel("Age:")
         self.age_input = QLineEdit()
         self.age_input.setPlaceholderText("e.g., 30")
+        self.age_input.setText("30")
         self.age_label.setStyleSheet("color: white;")  # Set white font color
         self.age_input.setStyleSheet("color: white;")  # Set white font color
         layout.addWidget(self.age_label)
@@ -71,6 +73,7 @@ class EMGConfigDialog(QDialog):
         self.height_label = QLabel("Height (cm):")
         self.height_input = QLineEdit()
         self.height_input.setPlaceholderText("e.g., 175")
+        self.height_input.setText("175")
         self.height_label.setStyleSheet("color: white;")  # Set white font color
         self.height_input.setStyleSheet("color: white;")  # Set white font color
         layout.addWidget(self.height_label)
@@ -80,6 +83,7 @@ class EMGConfigDialog(QDialog):
         self.weight_label = QLabel("Weight (kg):")
         self.weight_input = QLineEdit()
         self.weight_input.setPlaceholderText("e.g., 70")
+        self.weight_input.setText("70")
         self.weight_label.setStyleSheet("color: white;")  # Set white font color
         self.weight_input.setStyleSheet("color: white;")  # Set white font color
         layout.addWidget(self.weight_label)
@@ -94,13 +98,35 @@ class EMGConfigDialog(QDialog):
         self.setLayout(layout)
 
     def get_values(self):
+        if not all([
+            self.sample_rate_input.text(),
+            self.channel_mask_input.text(),
+            self.data_length_input.text(),
+            self.resolution_input.text(),
+        ]):
+            raise ValueError("All fields are required")
+        
+        age_input = age_input.text()
+        height_input = height_input.text()
+        weight_input = weight_input.text()
+        gender_combobox = gender_combobox.currentText()
+        
+        if self.age_input.text() is None:
+            age_input = -1
+        if self.height_input.text() is None:
+            height_input = -1
+        if self.weight_input.text() is None:
+            weight_input = -1
+        if self.gender_combobox.currentText is None or self.gender_combobox.currentText == "Other":
+            gender_combobox = "Unknown"
+
         return {
             'sample_rate': int(self.sample_rate_input.text()),
             'channel_mask': int(self.channel_mask_input.text(), 16),  # Assuming hex input
             'data_length': int(self.data_length_input.text()),
             'resolution': int(self.resolution_input.text()),
-            'gender': self.gender_combobox.currentText(),
-            'age': int(self.age_input.text()),
-            'height': int(self.height_input.text()),
-            'weight': int(self.weight_input.text())
+            'gender': str(gender_combobox),
+            'age': int(age_input),
+            'height': int(height_input),
+            'weight': int(weight_input),
         }

@@ -88,7 +88,6 @@ install_dependencies() {
     export PIPENV_IGNORE_VIRTUALENVS=1
     export PIPENV_VERBOSITY=-1
     pipenv install --dev
-    pipenv run python main.py -v
 }
 
 # Activate the virtual environment
@@ -97,6 +96,7 @@ activate() {
         source venv/Scripts/activate
     else
         source venv/bin/activate
+        pipenv run -v sudo python main.py
     fi
 }
 

@@ -6,3 +6,7 @@ __pycache__/
 /venv/
 Pipfile
 Pipfile.lock
+drive_credentials.json
+emg_raw_data.csv
+gesture_data.csv
+quaternion_data.csv
