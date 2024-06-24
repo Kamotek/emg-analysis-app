@@ -11,6 +11,7 @@ class GoogleDriveManager:
         self.client_secrets_file = Path(__file__).parent / 'client_secrets.json'
 
         self.gauth = GoogleAuth(settings_file=self.settings_file)
+        self.gauth.settings['save_credentials_file'] = Path(__file__).parent / self.gauth.settings.get('save_credentials_file')
         self.gauth.LoadClientConfigFile(self.client_secrets_file)
 
         self.authenticate_persistently()
@@ -20,7 +21,7 @@ class GoogleDriveManager:
 
     def authenticate_persistently(self):
         """ Login to Google Drive and save the credentials securely to a file."""
-        credentials_path = Path(self.gauth.settings.get('save_credentials_file'))
+        credentials_path = Path(__file__).parent / self.gauth.settings.get('save_credentials_file')
 
         if credentials_path.exists():
             self.gauth.LoadCredentialsFile(credentials_path)
@@ -117,4 +118,6 @@ class GoogleDriveManager:
         file.GetContentFile(local_path)
 
     def list_datasets(self):
-        return [d['title'] for d in self.drive.ListFile({'q': f"'{self.app_folder_id}' in parents and trashed=false"}).GetList()]
+        query = f"'{self.app_folder_id}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false"
+        datasets = [d['title'] for d in self.drive.ListFile({'q': query}).GetList()]
+        return datasets
