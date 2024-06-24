@@ -209,14 +209,9 @@ class MainWindow(QMainWindow):
             QMessageBox.warning(self, "Draw Chart", "Failed to generate chart.")
             return
 
-        print("Figure received: ", fig)  # Debugging print
-        print("Chart area geometry:", self.chart_area.geometry())
-        print("Chart area size:", self.chart_area.size())
-
-        # Set the chart on the existing chart_area instance
         self.chart_area.set_chart(fig)
-        self.chart_area.update()  # Force the chart area to update
-        self.chart_area.repaint()  # Force repainting of the chart area
+        self.chart_area.update()  
+        self.chart_area.repaint()  
 
     def classify_data(self, method):
         data = self.connector.fetch_data()
