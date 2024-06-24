@@ -226,7 +226,7 @@ class Connector(QObject):
         for file in base_path.rglob("*.gz"):  # More efficient to filter directly in rglob
             gender = self.get_gender_from_metadata(file)
             files_and_genders.append((file, gender))
-    return files_and_genders
+        return files_and_genders
 
     def get_local_datasets_IDs(self):
         return self.data_manager.list_datasets()
