@@ -2,6 +2,7 @@ import csv
 import struct
 import time
 from pathlib import Path
+import yaml
 
 import yaml
 from PySide6.QtCore import QObject, Signal
@@ -206,14 +207,26 @@ class Connector(QObject):
         # Replace with actual Amplified Random Forest classification logic
         return classifiers_and_tests.classifier_tree_with_feature_selection.main()
 
-    base_path = Path("legacy_to_be_deleted/preprocessed_data/")
+    def get_gender_from_metadata(self, file):
+        """Retrieve the gender from the Metadata.yaml file located in the same directory as the file."""
+        metadata_file = file.parent / "metadata.yaml"
+        gender = "Unknown"  # Default if metadata or gender is missing
+        
+        if metadata_file.exists():
+            with metadata_file.open() as f:
+                metadata = yaml.safe_load(f)
+                gender = metadata.get("subject", {}).get("gender", "Unknown").capitalize()
+
+        return gender
 
     def get_all_csv_files(self):
-        csv_files = []
-        for file in self.base_path.rglob("*"):
-            if file.suffix == ".csv":
-                csv_files.append(file)
-        return csv_files
+        base_path = Path("assets/")
+
+        files_and_genders = []
+        for file in base_path.rglob("*.gz"):  # More efficient to filter directly in rglob
+            gender = self.get_gender_from_metadata(file)
+            files_and_genders.append((file, gender))
+    return files_and_genders
 
     def get_local_datasets_IDs(self):
         return self.data_manager.list_datasets()

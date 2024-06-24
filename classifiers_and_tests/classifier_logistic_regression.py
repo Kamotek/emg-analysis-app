@@ -7,61 +7,63 @@ from sklearn.metrics import classification_report
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 from sklearn.pipeline import make_pipeline
+import yaml
+import gzip
+import pickle
+from pathlib import Path
 import io
 
 def main():
-    names = ['Adam', 'Darina', 'Franek', 'Gabi', 'Kajtek', 'Kasia', 'Misia', 'Slawek']
-    datasets = ['dataset_1', 'dataset_2', 'dataset_3']
-    gender_labels = {'Adam': 'male', 'Darina': 'female', 'Franek': 'male', 'Gabi': 'female', 'Kajtek': 'male', 'Kasia': 'female', 'Misia': 'female', 'Slawek': 'male'}
-
-    all_wavelet_data = []
+    base_dir = Path("assets/band")  # Set base directory for searching data
+    all_emg_data = []
     all_labels = []
-
-    def read_wavelet_transform_data(folder):
-        wavelet_file_path = os.path.join(folder, 'Wavelet Transform.csv')
-        wavelet_data = pd.read_csv(wavelet_file_path, header=None, on_bad_lines='skip').values.flatten()
-        return wavelet_data
-
-    def read_wavelet_transform_freq_data(folder):
-        wavelet_freq_file_path = os.path.join(folder, 'Wavelet Transform_frequencies.csv')
-        wavelet_freq_data = pd.read_csv(wavelet_freq_file_path, header=None, on_bad_lines='skip').values.flatten()
-        return wavelet_freq_data
 
     max_length = 0
     data_store = []
 
-    for name in names:
-        for dataset in datasets:
-            data_folder = get_data_folder(name, dataset)
-            try:
-                wavelet_data = read_wavelet_transform_data(data_folder)
-                wavelet_freq_data = read_wavelet_transform_freq_data(data_folder)
+    # Function to read EMG data from a pkl.gz file
+    def read_emg_data(emg_data_file):
+        with gzip.open(emg_data_file, 'rb') as f:
+            emg_data = pickle.load(f)
+        return np.array(emg_data).flatten()  # Flatten to a 1D array
 
-                combined_data = np.concatenate((wavelet_data, wavelet_freq_data))
-                data_store.append((combined_data, gender_labels[name]))
+    # Function to get gender from metadata.yaml file
+    def get_gender_from_metadata(metadata_file):
+        with metadata_file.open() as f:
+            metadata = yaml.safe_load(f)
+        gender = metadata.get('subject', {}).get('gender', 'unknown').lower()
+        return 'male' if gender == 'm' else 'female' if gender == 'f' else 'unknown'
 
-                if len(combined_data) > max_length:
-                    max_length = len(combined_data)
-            except Exception as e:
-                print(f"Skipping {name}-{dataset} due to error: {e}")
-                continue
+    # Search for files in the directory
+    for subdir in base_dir.rglob('*'):
+        if subdir.is_dir():
+            emg_data_file = subdir / 'kalman_filtered_emg_data.pkl.gz'
+            metadata_file = subdir / 'metadata.yaml'
+            if emg_data_file.exists() and metadata_file.exists():
+                try:
+                    emg_data = read_emg_data(emg_data_file)
+                    gender = get_gender_from_metadata(metadata_file)
+                    if gender != 'unknown':
+                        data_store.append((emg_data, gender))
+                        if len(emg_data) > max_length:
+                            max_length = len(emg_data)
+                except Exception as e:
+                    print(f"Skipping {emg_data_file} due to error: {e}")
+                    continue
 
-    for combined_data, label in data_store:
-        padded_data = np.pad(combined_data, (0, max_length - len(combined_data)), 'constant')
-        all_wavelet_data.append(padded_data)
+    # Pad data to ensure consistent length
+    for emg_data, label in data_store:
+        padded_data = np.pad(emg_data, (0, max_length - len(emg_data)), 'constant')
+        all_emg_data.append(padded_data)
         all_labels.append(label)
 
-    X = np.array(all_wavelet_data)
+    X = np.array(all_emg_data)
     y = np.array(all_labels)
 
-    # Create StringIO object to capture print output
     output = io.StringIO()
-
-    # Print the shape of the data
     output.write(f"Shape of X: {X.shape}\n")
-    output.write(f"Shape of y: {y.shape}\n")
+    output.write(f"Shape of y: {y.shape}\n\n")
 
-    # Check class distribution
     class_distribution = pd.Series(y).value_counts()
     output.write(f"Class distribution:\n{class_distribution}\n\n")
 
@@ -79,7 +81,6 @@ def main():
 
     y_pred = pipeline.predict(X_test)
 
-    # Evaluate the classifier
     output.write("Classification Report:\n")
     output.write(f"{classification_report(y_test, y_pred)}\n")
 
@@ -87,24 +88,11 @@ def main():
     cv_scores = cross_val_score(pipeline, X, y, cv=cv)
     output.write(f"CV Average Score: {cv_scores.mean()}\n")
 
-    # Get the entire string content
     result = output.getvalue()
     output.close()
 
+    print(result)
     return result
-
-def get_data_folder(name, dataset):
-    base_dir = os.path.dirname(__file__)
-    relative_path = os.path.join(
-        base_dir,
-        '..',
-        'preprocessed_data',
-        name,
-        f'{dataset}',
-        'features'
-    )
-    data_folder = os.path.normpath(relative_path)
-    return data_folder
 
 if __name__ == "__main__":
     result = main()
