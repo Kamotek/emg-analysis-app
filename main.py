@@ -101,24 +101,30 @@ class MainWindow(QMainWindow):
         self.devices = self.connector.scan_devices()
         if not self.devices:
             QMessageBox.information(self, "Scan Devices", "No devices found.")
-            return
+            return False
 
         self.ui.config_list.clear()  # Clear the list before adding new items
         for device in self.devices:
             item = QListWidgetItem(f"{device['name']} ({device['address']})")
             item.setData(1, device['address'])  # Store the address in the item for later use
             self.ui.config_list.addItem(item)
+        
+        return True
+
 
     def connect_device(self):
         selected_items = self.ui.config_list.selectedItems()
         if not selected_items:
             QMessageBox.warning(self, "Connect Device", "No device selected.")
-            return
+            return False
 
         selected_item = selected_items[0]  # Get the first selected item
         device_address = selected_item.data(1)  # Get the stored address
         self.connector.connect_device(device_address)
         QMessageBox.information(self, "Connect Device", f"Connected to {device_address}")
+
+        return True
+
 
     def get_firmware_version(self):
         self.connector.get_firmware_version()
@@ -200,18 +206,21 @@ class MainWindow(QMainWindow):
         selected_items = self.ui.data_list.selectedItems()
         if not selected_items:
             QMessageBox.warning(self, "Draw Chart", "No file selected.")
-            return
+            return False
 
         selected_file = selected_items[0].text().split('--')[0].strip()
         fig = self.connector.visualize_file(selected_file)
 
         if fig is None:
             QMessageBox.warning(self, "Draw Chart", "Failed to generate chart.")
-            return
+            return False
+        
 
         self.chart_area.set_chart(fig)
         self.chart_area.update()  
         self.chart_area.repaint()  
+
+        return True
 
     def classify_data(self, method):
         data = self.connector.fetch_data()

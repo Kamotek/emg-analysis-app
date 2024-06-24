@@ -17,16 +17,6 @@ from band_interface.gforce import DataNotifFlags, GForceProfile, NotifDataType
 from cloud_storage.drive_manager import GoogleDriveManager
 from visualizers import draw
 
-# Global file handlers and CSV writers for data logging
-quat_file = open("quaternion_data.csv", "w", newline='')
-quat_writer = csv.writer(quat_file)
-
-emg_file = open("emg_raw_data.csv", "w", newline='')
-emg_writer = csv.writer(emg_file)
-
-gest_file = open("gesture_data.csv", "w", newline='')
-gest_writer = csv.writer(gest_file)
-
 
 # Callback functions
 def set_cmd_cb(resp):
@@ -52,7 +42,6 @@ def ondata(data, connector):
             quat_iter = struct.iter_unpack("f", data[1:])
             quaternion = [i[0] for i in quat_iter]
             print("quaternion:", quaternion)
-            quat_writer.writerow(quaternion)
             connector.quaternionDataReceived.emit(quaternion)  # Emitting signal for quaternion data
 
         elif data[0] == NotifDataType["NTF_EMG_ADC_DATA"] and len(data) == 129:
@@ -78,12 +67,10 @@ def ondata(data, connector):
             if len(data) == 2:
                 ges = struct.unpack("<B", data[1:])
                 print(f"ges_id:{ges[0]}")
-                gest_writer.writerow([ges[0]])
             else:
                 ges = struct.unpack("<B", data[1:2])[0]
                 s = struct.unpack("<H", data[2:4])[0]
                 print(f"ges_id:{ges}  strength:{s}")
-                gest_writer.writerow([ges, s])
 
 
 class Connector(QObject):

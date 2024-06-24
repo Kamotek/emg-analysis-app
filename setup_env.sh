@@ -74,6 +74,7 @@ scikit-learn = "*"
 imbalanced-learn = "*"
 pydrive = "*"
 matplotlib = "*"
+pytest = "*"
 
 [requires]
 python_version = "3.11"

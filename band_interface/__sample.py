@@ -28,14 +28,14 @@ start_time = 0
 
 # ------------------ my code ------------------
 
-quat_file = open("quaternion_data.csv", "w", newline='')
-quat_writer = csv.writer(quat_file)
+# quat_file = open("quaternion_data.csv", "w", newline='')
+# quat_writer = csv.writer(quat_file)
 
-emg_file = open("emg_raw_data.csv", "w", newline='')
-emg_writer = csv.writer(emg_file)
+# emg_file = open("emg_raw_data.csv", "w", newline='')
+# emg_writer = csv.writer(emg_file)
 
-gest_file = open("gesture_data.csv", "w", newline='')
-gest_writer = csv.writer(gest_file)
+# gest_file = open("gesture_data.csv", "w", newline='')
+# gest_writer = csv.writer(gest_file)
 
 
 # ------------------ my code ------------------
@@ -49,7 +49,7 @@ def ondata(data):
             quat_iter = struct.iter_unpack("f", data[1:])
             quaternion = [i[0] for i in quat_iter]
             print("quaternion:", quaternion)
-            quat_writer.writerow(quaternion)
+            # quat_writer.writerow(quaternion)
 
         elif data[0] == NotifDataType["NTF_EMG_ADC_DATA"] and len(data) == 129:
             if start_time == 0:
@@ -66,18 +66,18 @@ def ondata(data):
 
             # Extract the EMG data and write to file
             emg_data = list(data[1:129])
-            emg_writer.writerow(emg_data)
+            # emg_writer.writerow(emg_data)
 
         elif data[0] == NotifDataType["NTF_EMG_GEST_DATA"]:
             if len(data) == 2:
                 ges = struct.unpack("<B", data[1:])
                 print(f"ges_id:{ges[0]}")
-                gest_writer.writerow([ges[0]])
+                # gest_writer.writerow([ges[0]])
             else:
                 ges = struct.unpack("<B", data[1:2])[0]
                 s = struct.unpack("<H", data[2:4])[0]
                 print(f"ges_id:{ges}  strength:{s}")
-                gest_writer.writerow([ges, s])
+                # gest_writer.writerow([ges, s])
 
 
 
